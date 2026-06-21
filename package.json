@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "workspaces":[
+  "workspaces": [
     "backend"
   ],
   "scripts": {
+    "dev": "tsx --watch backend/adapters/http/index.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
+  "author": "Raghart",
   "license": "ISC",
   "devEngines": {
     "packageManager": {
@@ -19,5 +20,8 @@
       "onFail": "download"
     }
   },
-  "type": "module"
+  "type": "module",
+  "devDependencies": {
+    "tsx": "^4.22.4"
+  }
 }
