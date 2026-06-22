@@ -4,10 +4,10 @@ import { Readable } from "stream";
 import { Customer } from "../domain/csvTypes";
 import { CUSTOMERURL } from "../domain/csvUrls";
 
-const fetchCustomers = async () => {
+const fetchRawCustomers = async () => {
     const res = await axios.get(CUSTOMERURL);
     const stream = Readable.from(res.data);
-    
+
     return new Promise((res, rej) => {
         const resultsArr: Customer[] = [];
 
@@ -18,5 +18,4 @@ const fetchCustomers = async () => {
         }).on("error", (err) => rej(err));
     });
 };
-const customersArr = await fetchCustomers()
-console.log(customersArr);
+
