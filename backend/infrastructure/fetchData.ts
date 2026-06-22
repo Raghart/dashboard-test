@@ -4,7 +4,7 @@ import { Readable } from "stream";
 import { Customer } from "../domain/csvTypes";
 import { CUSTOMERURL, ITEMORDERSURL } from "../domain/csvUrls";
 
-const fetchRawCustomers = async () => {
+const fetchRawCustomers = async () : Promise<Customer[]> => {
     const res = await axios.get(CUSTOMERURL);
     const stream = Readable.from(res.data);
 
