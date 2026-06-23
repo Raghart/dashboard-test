@@ -42,30 +42,43 @@ model RawCategName {
 }
 
 model RawProduct {
-    product_id String @id
-    product_category_name String?
-    product_name_lenght Int?
-    product_description_lenght Int?
-    product_photos_qty Int?
-    product_weight_g Int?
-    product_length_cm Int?
-    product_height_cm Int?
-    product_width_cm Int?
+  product_id String @id
+  product_category_name String?
+  product_name_lenght Int?
+  product_description_lenght Int?
+  product_photos_qty Int?
+  product_weight_g Int?
+  product_length_cm Int?
+  product_height_cm Int?
+  product_width_cm Int?
 
-    @@map("product")
-    @@schema("raw")
+  @@map("product")
+  @@schema("raw")
 }
 
 model RawOrder {
-    order_id String @id
-    customer_id String?
-    order_status String?
-    order_purchase_timestamp DateTime?
-    order_approved_at DateTime?
-    order_delivered_carrier_date DateTime?
-    order_delivered_customer_date DateTime?
-    order_estimated_delivery_date DateTime?
+  order_id String @id
+  customer_id String?
+  order_status String?
+  order_purchase_timestamp DateTime?
+  order_approved_at DateTime?
+  order_delivered_carrier_date DateTime?
+  order_delivered_customer_date DateTime?
+  order_estimated_delivery_date DateTime?
 
-    @@map("order")
-    @@schema("raw")
+  @@map("order")
+  @@schema("raw")
+}
+
+model RawOrderReview {
+  review_id String @id
+  order_id String?
+  review_score Int?
+  review_comment_title String?
+  review_comment_message String?
+  review_creation_date DateTime?
+  review_answer_timestamp DateTime?
+
+  @@map("orderReview")  
+  @@schema("raw")
 }
