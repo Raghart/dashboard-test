@@ -2,7 +2,7 @@ import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
 import { RawCustomer, RawItemOrder, RawOrderPayment, RawOrderReview } from "../domain/csvTypes";
-import { CUSTOMERURL, ITMORDERURL, ORDPAYMENTURL, ORDREVIEWSURL } from "../domain/csvUrls";
+import { CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -89,5 +89,17 @@ const fetchOrderReviews = async () : Promise<RawOrderReview[]> => {
     });
 };
 
-const t = await fetchOrderReviews();
+const fetchOrders = async () : Promise<any[]> => {
+    const stream = await fetchCSVData(ORDERSURL);
+
+    return new Promise((res, rej) => {
+        const ordersArr: any[] = [];
+
+        stream.pipe(csv()).on("data", (row: any) => ordersArr.push(row))
+        .on("end", () => res(ordersArr))
+        .on("error", (err) => rej(err));
+    });
+};
+
+const t = await fetchOrders();
 console.log(t);
