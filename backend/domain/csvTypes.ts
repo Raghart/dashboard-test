@@ -56,3 +56,10 @@ export interface RawProduct {
     product_height_cm: number,
     product_width_cm: number
 };
+
+export interface RawSeller {
+    seller_id: string,
+    seller_zip_code_prefix: number,
+    seller_city: string,
+    seller_state: string
+};
