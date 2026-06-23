@@ -1,7 +1,7 @@
 import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
-import { RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct } from "../domain/csvTypes";
+import { RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
 import { CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
@@ -130,13 +130,18 @@ const fetchProducts = async () : Promise<RawProduct[]> => {
     });
 };
 
-const fetchSellers = async () : Promise<any[]> => {
+const fetchSellers = async () : Promise<RawSeller[]> => {
     const stream = await fetchCSVData(SELLERSURL);
 
     return new Promise((res, rej) => {
-        const sellersArr: any[] = [];
+        const sellersArr: RawSeller[] = [];
 
-        stream.pipe(csv()).on("data", (row: any) => sellersArr.push(row))
+        stream.pipe(csv()).on("data", (row: any) => sellersArr.push({
+            seller_id: row.seller_id,
+            seller_zip_code_prefix: parseInt(row.seller_zip_code_prefix),
+            seller_city: row.seller_city,
+            seller_state: row.seller_state
+        }))
         .on("end", () => res(sellersArr))
         .on("error", (err) => rej(err));
     });
