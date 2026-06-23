@@ -33,3 +33,14 @@ export interface RawOrderReview {
     review_creation_date: Date,
     review_answer_timestamp: Date
 };
+
+export interface RawOrder {
+    order_id: string,
+    customer_id: string,
+    order_status: string,
+    order_purchase_timestamp: Date,
+    order_approved_at: Date,
+    order_delivered_carrier_date: Date,
+    order_delivered_customer_date: Date,
+    order_estimated_delivery_date: Date
+};
