@@ -34,10 +34,24 @@ model RawSeller {
 }
 
 model RawCategName {
-  id Int @id
-  product_category_name String?
+  product_category_name String @id
   product_category_name_english String?
 
   @@map("categoryName")
   @@schema("raw")
+}
+
+model RawProduct {
+    product_id String @id
+    product_category_name String?
+    product_name_lenght Int?
+    product_description_lenght Int?
+    product_photos_qty Int?
+    product_weight_g Int?
+    product_length_cm Int?
+    product_height_cm Int?
+    product_width_cm Int?
+
+    @@map("product")
+    @@schema("raw")
 }

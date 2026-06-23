@@ -161,3 +161,6 @@ const fetchCategNames = async () => {
         .on("error", (err) => rej(err))
     });
 };
+
+const t = await fetchProducts();
+console.log(t);
