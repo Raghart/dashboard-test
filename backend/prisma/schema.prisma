@@ -25,9 +25,9 @@ model RawCustomer {
 
 model RawSeller {
     seller_id String @id
-    seller_zip_code_prefix Int
-    seller_city String
-    seller_state String
+    seller_zip_code_prefix Int?
+    seller_city String?
+    seller_state String?
 
     @@map("seller")
     @@schema("raw")
