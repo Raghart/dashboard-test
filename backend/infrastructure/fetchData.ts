@@ -95,7 +95,16 @@ const fetchOrders = async () : Promise<RawOrder[]> => {
     return new Promise((res, rej) => {
         const ordersArr: RawOrder[] = [];
 
-        stream.pipe(csv()).on("data", (row: RawOrder) => ordersArr.push(row))
+        stream.pipe(csv()).on("data", (row: any) => ordersArr.push({
+            order_id: row.order_id,
+            customer_id: row.customer_id,
+            order_status: row.order_status,
+            order_purchase_timestamp: new Date(row.order_purchase_timestamp),
+            order_approved_at: new Date(row.order_approved_at),
+            order_delivered_carrier_date: new Date(row.order_delivered_carrier_date),
+            order_delivered_customer_date: new Date(row.order_delivered_customer_date),
+            order_estimated_delivery_date: new Date(row.order_estimated_delivery_date)
+        }))
         .on("end", () => res(ordersArr))
         .on("error", (err) => rej(err));
     });
