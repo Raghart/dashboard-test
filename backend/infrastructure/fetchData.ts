@@ -1,7 +1,7 @@
 import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
-import { RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
+import { RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
@@ -151,9 +151,12 @@ const fetchCategNames = async () => {
     const stream = await fetchCSVData(CATNAMEURL);
     
     return new Promise((res, rej) => {
-        const categNamesArr: any[] = [];
+        const categNamesArr: RawCategName[] = [];
 
-        stream.pipe(csv()).on("data", (row: any) => categNamesArr.push(row))
+        stream.pipe(csv()).on("data", (row: RawCategName) => categNamesArr.push({
+            product_category_name: row.product_category_name,
+            product_category_name_english: row.product_category_name_english
+        }))
         .on("end", () => res(categNamesArr))
         .on("error", (err) => rej(err))
     });
