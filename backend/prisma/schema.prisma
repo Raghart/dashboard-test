@@ -29,7 +29,7 @@ model RawSeller {
     seller_city String?
     seller_state String?
 
-    @@map("seller")
+    @@map("sellers")
     @@schema("raw")
 }
 
@@ -37,7 +37,7 @@ model RawCategName {
   product_category_name String @id
   product_category_name_english String?
 
-  @@map("categoryName")
+  @@map("categoryNames")
   @@schema("raw")
 }
 
@@ -52,7 +52,7 @@ model RawProduct {
   product_height_cm Int?
   product_width_cm Int?
 
-  @@map("product")
+  @@map("products")
   @@schema("raw")
 }
 
@@ -66,7 +66,7 @@ model RawOrder {
   order_delivered_customer_date DateTime?
   order_estimated_delivery_date DateTime?
 
-  @@map("order")
+  @@map("orders")
   @@schema("raw")
 }
 
@@ -79,6 +79,6 @@ model RawOrderReview {
   review_creation_date DateTime?
   review_answer_timestamp DateTime?
 
-  @@map("orderReview")  
+  @@map("orderReviews")
   @@schema("raw")
 }
