@@ -4,6 +4,11 @@ import { Readable } from "stream";
 import { RawCustomer } from "../domain/csvTypes";
 import { CUSTOMERURL, ITEMORDERSURL } from "../domain/csvUrls";
 
+const fetchCSVData = async (url: string) : Promise<Readable> => {
+    const res = await axios.get(url);
+    return Readable.from(res.data);
+};
+
 const fetchRawCustomers = async () : Promise<RawCustomer[]> => {
     const res = await axios.get(CUSTOMERURL);
     const stream = Readable.from(res.data);
