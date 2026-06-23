@@ -82,3 +82,13 @@ model RawOrderReview {
   @@map("orderReviews")
   @@schema("raw")
 }
+
+model RawOrderPayment {
+  order_id String @id
+  payment_sequential Int?
+  payment_type String?
+  payment_installments Int?
+  payment_value Float?
+
+  @@schema("raw")
+}
