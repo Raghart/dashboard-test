@@ -8,7 +8,7 @@ export interface RawCustomer {
 
 export interface RawItemOrder {
     order_id: string,
-    order_item_id: string,
+    order_item_id: number,
     product_id: string,
     seller_id: string,
     shipping_limit_date: Date,
