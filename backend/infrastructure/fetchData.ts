@@ -1,7 +1,7 @@
 import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
-import { RawCustomer, RawItemOrder, RawOrderPayment } from "../domain/csvTypes";
+import { RawCustomer, RawItemOrder, RawOrderPayment, RawOrderReview } from "../domain/csvTypes";
 import { CUSTOMERURL, ITEMORDERSURL, ORDERPAYMENTURL, ORDERREVIEWSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
@@ -68,18 +68,26 @@ const fetchOrderPayments = async () : Promise<RawOrderPayment[]> => {
     });
 };
 
-const fetchOrderReviews = async () : Promise<any[]> => {
+const fetchOrderReviews = async () : Promise<RawOrderReview[]> => {
     const stream = await fetchCSVData(ORDERREVIEWSURL);
 
     return new Promise((res, rej) => {
-        const orderReviewsArr: any[] = [];
+        const orderReviewsArr: RawOrderReview[] = [];
 
-        stream.pipe(csv()).on("data", (row: any) => orderReviewsArr.push(row))
+        stream.pipe(csv()).on("data", (row: any) => orderReviewsArr.push({
+            review_id: row.review_id,
+            order_id: row.order_id,
+            review_score: parseInt(row.review_score),
+            review_comment_title: row.review_comment_title,
+            review_comment_message: row.review_comment_message,
+            review_creation_date: new Date(row.review_creation_date),
+            review_answer_timestamp: new Date(row.review_answer_timestamp)
+        }))
         .on("end", () => {
             res(orderReviewsArr);
         }).on("error", (err) => rej(err));
     });
 };
 
-const t = await fetchOrderPayments();
+const t = await fetchOrderReviews();
 console.log(t);
