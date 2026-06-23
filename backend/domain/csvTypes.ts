@@ -15,3 +15,11 @@ export interface RawItemOrder {
     price: number,
     freight_value: number
 }
+
+export interface RawOrderPayment {
+    order_id: string,
+    payment_sequential: number,
+    payment_type: string,
+    payment_installments: number,
+    payment_value: number
+}

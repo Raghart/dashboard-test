@@ -1,7 +1,7 @@
 import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
-import { RawCustomer, RawItemOrder } from "../domain/csvTypes";
+import { RawCustomer, RawItemOrder, RawOrderPayment } from "../domain/csvTypes";
 import { CUSTOMERURL, ITEMORDERSURL, ORDERPAYMENTURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
@@ -51,12 +51,18 @@ const fetchRawItemOrders = async () => {
     });
 };
 
-const fetchOrderPayments = async () : Promise<any[]> => {
+const fetchOrderPayments = async () : Promise<RawOrderPayment[]> => {
     const stream = await fetchCSVData(ORDERPAYMENTURL);
 
     return new Promise((res, rej) => {
-        const orderPaymentsArr: any[] = [];
-        stream.pipe(csv()).on("data", (row: any) => orderPaymentsArr.push(row))
+        const orderPaymentsArr: RawOrderPayment[] = [];
+        stream.pipe(csv()).on("data", (row: any) => orderPaymentsArr.push({
+            order_id: row.order_id,
+            payment_sequential: parseInt(row.payment_sequential),
+            payment_type: row.payment_type,
+            payment_installments: parseInt(row.payment_installments),
+            payment_value: parseFloat(row.payment_value)
+        }))
         .on("end", () => {
             console.log(`the total of order payments are ${orderPaymentsArr.length}`);
             res(orderPaymentsArr);
