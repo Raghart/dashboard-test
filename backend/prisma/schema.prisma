@@ -32,3 +32,12 @@ model RawSeller {
     @@map("seller")
     @@schema("raw")
 }
+
+model RawCategName {
+  id Int @id
+  product_category_name String?
+  product_category_name_english String?
+
+  @@map("categoryName")
+  @@schema("raw")
+}
