@@ -2,7 +2,7 @@ import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
 import { RawCustomer, RawItemOrder, RawOrderPayment, RawOrderReview } from "../domain/csvTypes";
-import { CUSTOMERURL, ITEMORDERSURL, ORDERPAYMENTURL, ORDERREVIEWSURL } from "../domain/csvUrls";
+import { CUSTOMERURL, ITMORDERURL, ORDPAYMENTURL, ORDREVIEWSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -30,7 +30,7 @@ const fetchRawCustomers = async () : Promise<RawCustomer[]> => {
 };
 
 const fetchRawItemOrders = async () : Promise<RawItemOrder[]> => {
-    const stream = await fetchCSVData(ITEMORDERSURL);
+    const stream = await fetchCSVData(ITMORDERURL);
 
     return new Promise((res, rej) => {
         const itemOrdersArr: RawItemOrder[] = [];
@@ -51,7 +51,7 @@ const fetchRawItemOrders = async () : Promise<RawItemOrder[]> => {
 };
 
 const fetchOrderPayments = async () : Promise<RawOrderPayment[]> => {
-    const stream = await fetchCSVData(ORDERPAYMENTURL);
+    const stream = await fetchCSVData(ORDPAYMENTURL);
 
     return new Promise((res, rej) => {
         const orderPaymentsArr: RawOrderPayment[] = [];
@@ -69,7 +69,7 @@ const fetchOrderPayments = async () : Promise<RawOrderPayment[]> => {
 };
 
 const fetchOrderReviews = async () : Promise<RawOrderReview[]> => {
-    const stream = await fetchCSVData(ORDERREVIEWSURL);
+    const stream = await fetchCSVData(ORDREVIEWSURL);
 
     return new Promise((res, rej) => {
         const orderReviewsArr: RawOrderReview[] = [];

@@ -1,4 +1,4 @@
 export const CUSTOMERURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_customers_dataset.csv";
-export const ITEMORDERSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_items_dataset.csv";
-export const ORDERPAYMENTURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_payments_dataset.csv";
-export const ORDERREVIEWSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_reviews_dataset.csv";
+export const ITMORDERURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_items_dataset.csv";
+export const ORDPAYMENTURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_payments_dataset.csv";
+export const ORDREVIEWSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_reviews_dataset.csv";
