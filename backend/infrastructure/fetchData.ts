@@ -1,7 +1,7 @@
 import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
-import { RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview } from "../domain/csvTypes";
+import { RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct } from "../domain/csvTypes";
 import { CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
@@ -110,11 +110,21 @@ const fetchOrders = async () : Promise<RawOrder[]> => {
     });
 };
 
-const fetchProducts = async () => {
+const fetchProducts = async () : Promise<RawProduct[]> => {
     const stream = await fetchCSVData(PRODUCTSURL);
     return new Promise((res, rej) => {
-        const productsArr: any[] = [];
-        stream.pipe(csv()).on("data", (row: any) => productsArr.push(row))
+        const productsArr: RawProduct[] = [];
+        stream.pipe(csv()).on("data", (row: any) => productsArr.push({
+            product_id: row.product_id,
+            product_category_name: row.product_category_name,
+            product_name_lenght: parseInt(row.product_name_lenght),
+            product_description_lenght: parseInt(row.product_description_lenght),
+            product_photos_qty: parseInt(row.product_photos_qty),
+            product_weight_g: parseInt(row.product_weight_g),
+            product_length_cm: parseInt(row.product_length_cm),
+            product_height_cm: parseInt(row.product_height_cm),
+            product_width_cm: parseInt(row.product_width_cm)
+        }))
         .on("end", () => res(productsArr))
         .on("error", (err) => rej(err))
     });
