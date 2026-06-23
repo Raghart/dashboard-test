@@ -2,7 +2,7 @@ import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
 import { RawCustomer, RawItemOrder, RawOrderPayment } from "../domain/csvTypes";
-import { CUSTOMERURL, ITEMORDERSURL, ORDERPAYMENTURL } from "../domain/csvUrls";
+import { CUSTOMERURL, ITEMORDERSURL, ORDERPAYMENTURL, ORDERREVIEWSURL } from "../domain/csvUrls";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -29,7 +29,7 @@ const fetchRawCustomers = async () : Promise<RawCustomer[]> => {
     });
 };
 
-const fetchRawItemOrders = async () => {
+const fetchRawItemOrders = async () : Promise<RawItemOrder[]> => {
     const stream = await fetchCSVData(ITEMORDERSURL);
 
     return new Promise((res, rej) => {
@@ -45,7 +45,6 @@ const fetchRawItemOrders = async () => {
             freight_value: parseFloat(row.freight_value)
         }))
         .on("end", () => {
-            console.log(`There are currently ${itemOrdersArr.length} items orders`);
             res(itemOrdersArr);
         }).on("error", (err) => rej(err));
     });
@@ -64,8 +63,20 @@ const fetchOrderPayments = async () : Promise<RawOrderPayment[]> => {
             payment_value: parseFloat(row.payment_value)
         }))
         .on("end", () => {
-            console.log(`the total of order payments are ${orderPaymentsArr.length}`);
             res(orderPaymentsArr);
+        }).on("error", (err) => rej(err));
+    });
+};
+
+const fetchOrderReviews = async () : Promise<any[]> => {
+    const stream = await fetchCSVData(ORDERREVIEWSURL);
+
+    return new Promise((res, rej) => {
+        const orderReviewsArr: any[] = [];
+
+        stream.pipe(csv()).on("data", (row: any) => orderReviewsArr.push(row))
+        .on("end", () => {
+            res(orderReviewsArr);
         }).on("error", (err) => rej(err));
     });
 };
