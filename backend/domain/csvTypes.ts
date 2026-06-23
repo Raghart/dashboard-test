@@ -63,3 +63,8 @@ export interface RawSeller {
     seller_city: string,
     seller_state: string
 };
+
+export interface RawCategName {
+    product_category_name: string,
+    product_category_name_english: string
+};
