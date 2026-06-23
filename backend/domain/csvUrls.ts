@@ -4,3 +4,4 @@ export const ORDPAYMENTURL = "https://raw.githubusercontent.com/spdrio/Brazilian
 export const ORDREVIEWSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_order_reviews_dataset.csv";
 export const ORDERSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_orders_dataset.csv";
 export const PRODUCTSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_products_dataset.csv";
+export const SELLERSURL = "https://raw.githubusercontent.com/spdrio/Brazilian-E-Commerce-Public-Dataset-by-Olist/refs/heads/master/files/olist_sellers_dataset.csv";
