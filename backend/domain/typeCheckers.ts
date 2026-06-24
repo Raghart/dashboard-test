@@ -9,7 +9,7 @@ export const isCustomer = (data: unknown) : boolean => {
 export const isItemOrder = (data: unknown) : boolean => {
     if (!data) return false;
 
-    return typeof data === "object" && "" in data && "order_id" in data
+    return typeof data === "object" && "order_id" in data
     && "order_item_id" in data && "product_id" in data && "seller_id" in data 
     && "shipping_limit_date" in data && "price" in data && "freight_value" in data;
 };
