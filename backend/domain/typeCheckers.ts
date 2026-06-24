@@ -49,6 +49,14 @@ export const isProduct = (data: unknown) : boolean => {
     && "product_height_cm" in data && "product_width_cm" in data;
 };
 
+export const isSeller = (data: unknown) => {
+    if (!data) return false;
+
+    return typeof data === "object" && "seller_id" in data
+    && "seller_zip_code_prefix" in data && "seller_city" in data 
+    && "seller_state" in data;
+};
+
 export const isRawObject = (data: unknown) => {
     return data && typeof data === "object";
 };
