@@ -308,12 +308,24 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: PRODUCTSURL,
             label: "Products",
-            stepFunc(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return
                 }
 
-                console.log(row.data)
+                await prisma.rawProduct.create({
+                    data: {
+                        product_id: row.data?.product_id ?? null,
+                        product_category_name: row.data?.product_category_name ?? null,
+                        product_name_lenght: row.data?.product_name_lenght ?? null,
+                        product_description_lenght: row.data?.product_description_lenght ?? null,
+                        product_photos_qty: row.data?.product_photos_qty ?? null,
+                        product_weight_g: row.data?.product_weight_g ?? null,
+                        product_length_cm: row.data?.product_length_cm ?? null,
+                        product_height_cm: row.data?.product_height_cm ?? null,
+                        product_width_cm: row.data?.product_width_cm ?? null
+                    }
+                });
             },
         },
         {
