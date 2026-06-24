@@ -5,62 +5,62 @@ import { isCategoryName, isCustomer, isItemOrder, isOrder, isOrderPayment, isOrd
 export const parseCustomer = (data: unknown) : data is RawCustomer => {
     if (isCustomer(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseItemOrder = (data: unknown) : data is RawItemOrder => {
     if (isItemOrder(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseOrderPayment = (data: unknown) : data is RawOrderPayment => {
     if (isOrderPayment(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseRawObject = (data: unknown) : data is any => {
     if (isRawObject(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseOrderReview = (data: unknown) : data is RawOrderReview => {
     if (!isOrderReview(data)) {
         return true;
-    }
+    };
     return false
-}
+};
 
 export const parseOrder = (data: unknown) : data is RawOrderReview => {
     if (!isOrder(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseProduct = (data: unknown) : data is RawProduct => {
     if (!isProduct(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseSeller = (data: unknown) : data is RawSeller => {
     if (!isSeller(data)) {
         return true;
-    }
+    };
     return false;
 };
 
 export const parseCategoryName = (data: unknown) : data is RawCategName => {
     if (!isCategoryName(data)) {
         return true;
-    }
+    };
     return false;
 };
