@@ -21,7 +21,7 @@ export const isOrderPayment = (data: unknown) : boolean => {
     && "payment_type" in data && "payment_installments" in data && "payment_value" in data;
 };
 
-const isOrderReview = (data: unknown) : boolean => {
+export const isOrderReview = (data: unknown) : boolean => {
     if (!data) return false;
     
     return typeof data === "object" && "review_id" in data
