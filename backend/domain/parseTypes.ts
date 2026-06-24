@@ -15,7 +15,7 @@ export const parseItemOrder = (data: unknown) : data is RawItemOrder => {
     return false;
 };
 
-const parseOrderPayment = (data: unknown) : data is RawOrderPayment => {
+export const parseOrderPayment = (data: unknown) : data is RawOrderPayment => {
     if (isOrderPayment(data)) {
         return true;
     }

@@ -6,7 +6,7 @@ import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVI
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
 import { isCustomer } from "../domain/typeCheckers";
-import { parseCustomer, parseItemOrder } from "../domain/parseTypes";
+import { parseCustomer, parseItemOrder, parseOrderPayment } from "../domain/parseTypes";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -229,7 +229,11 @@ const buildCsvLayout = (): CsvData[] => {
             url: ORDPAYMENTURL,
             label: "Order payments",
             stepFunc: (row: Papa.ParseStepResult<unknown>) => {
+                if (!parseOrderPayment(row.data)) {
+                    return;
+                }
 
+                console.log(row.data)
             }
         },
     ]
