@@ -20,3 +20,7 @@ export const isOrderPayment = (data: unknown) : boolean => {
     return typeof data === "object" && "order_id" in data && "payment_sequential" in data 
     && "payment_type" in data && "payment_installments" in data && "payment_value" in data;
 };
+
+export const isRawObject = (data: unknown) => {
+    return data && typeof data === "object";
+}

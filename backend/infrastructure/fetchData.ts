@@ -206,9 +206,9 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: CUSTOMERURL, 
             label: "Customers", 
-            stepFunc: (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseCustomer(row.data)) {
-                    return;
+            stepFunc: (row: Papa.ParseStepResult<any>) => {
+                if (typeof row.data !== "object") {
+                    return
                 }
 
                 console.log(row.data);
