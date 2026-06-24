@@ -3,6 +3,7 @@ import csv from "csv-parser";
 import { Readable } from "stream";
 import { RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
+import { prisma } from "../prisma/prismaClient";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -162,5 +163,10 @@ const fetchCategNames = async () => {
     });
 };
 
-const t = await fetchRawItemOrders();
-console.log(t);
+const checkRawDatabase = async () : Promise<boolean> => {
+    const customerCount = await prisma.rawCustomer.count();
+    return customerCount === 0;
+};
+
+const isDB = await checkRawDatabase();
+console.log(isDB);
