@@ -30,6 +30,15 @@ export const isOrderReview = (data: unknown) : boolean => {
     && "review_answer_timestamp" in data;
 };
 
+export const isOrder = (data: unknown) : boolean => {
+    if (!data) return false;
+
+    return typeof data === "object" && "order_id" in data
+    && "customer_id" in data && "order_status" in data && "order_purchase_timestamp" in data 
+    && "order_approved_at" in data && "order_delivered_carrier_date" in data 
+    && "order_delivered_customer_date" in data && "order_estimated_delivery_date" in data;
+};
+
 export const isRawObject = (data: unknown) => {
     return data && typeof data === "object";
 }
