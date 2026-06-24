@@ -10,7 +10,7 @@ const fetchCSVData = async (url: string) : Promise<Readable> => {
     return Readable.from(res.data);
 };
 
-const fetchRawCustomers = async () : Promise<RawCustomer[]> => {
+const fetchCustomers = async () : Promise<RawCustomer[]> => {
     const stream = await fetchCSVData(CUSTOMERURL);
 
     return new Promise((res, rej) => {
@@ -30,7 +30,7 @@ const fetchRawCustomers = async () : Promise<RawCustomer[]> => {
     });
 };
 
-const fetchRawItemOrders = async () : Promise<RawItemOrder[]> => {
+const fetcItemOrders = async () : Promise<RawItemOrder[]> => {
     const stream = await fetchCSVData(ITMORDERURL);
 
     return new Promise((res, rej) => {
@@ -168,5 +168,22 @@ const checkRawDatabase = async () : Promise<boolean> => {
     return customerCount === 0;
 };
 
-const isDB = await checkRawDatabase();
-console.log(isDB);
+const fetchRawDatabaseData = async () : Promise<void> => {
+    const isRaw = await checkRawDatabase();
+    if (!isRaw) {
+        return
+    }
+
+    await Promise.all([
+        fetchCustomers(),
+        fetcItemOrders(),
+        fetchOrderPayments(),
+        fetchOrderReviews(),
+        fetchOrders(),
+        fetchProducts(),
+        fetchSellers(),
+        fetchCategNames(),
+    ])
+};
+
+await fetchRawDatabaseData();
