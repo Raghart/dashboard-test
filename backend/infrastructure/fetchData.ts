@@ -247,12 +247,20 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: ORDPAYMENTURL,
             label: "Order payments",
-            stepFunc: (row: Papa.ParseStepResult<unknown>) => {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return;
                 }
 
-                console.log(row.data)
+                await prisma.rawOrderPayment.create({
+                    data: {
+                        order_id: row.data?.order_id ?? null,
+                        payment_sequential: row.data?.payment_sequential ?? null,
+                        payment_type: row.data?.payment_type ?? null,
+                        payment_installments: row.data?.payment_installments ?? null,
+                        payment_value: row.data?.payment_value ?? null
+                    }
+                })
             }
         },
         {
