@@ -96,7 +96,7 @@ model RawOrderPayment {
 }
 
 model RawItemOrder {
-  id Int @id
+  id Int @id @default(autoincrement())
   order_item_id Int?
   order_id String?
   product_id String?

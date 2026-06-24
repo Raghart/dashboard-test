@@ -231,7 +231,17 @@ const buildCsvLayout = (): CsvData[] => {
                     return;
                 }
 
-                console.log(row.data);
+                prisma.rawItemOrder.create({
+                    data: {
+                        order_id: row.data?.order_id ?? null,
+                        order_item_id: row.data?.order_item_id ?? null,
+                        product_id: row.data?.product_id ?? null,
+                        seller_id: row.data?.seller_id ?? null,
+                        shipping_limit_date: row.data?.shipping_limit_date ?? null,
+                        price: row.data?.price ?? null,
+                        freight_value: row.data?.freight_value ?? null,
+                    }
+                })
             }
         },
         {
