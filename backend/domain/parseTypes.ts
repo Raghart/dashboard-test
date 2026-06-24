@@ -1,5 +1,6 @@
 import { RawCustomer, RawItemOrder, RawOrderPayment, RawOrderReview } from "../prisma/client/client";
-import { isCustomer, isItemOrder, isOrder, isOrderPayment, isOrderReview, isRawObject } from "./typeCheckers";
+import { RawProduct } from "./csvTypes";
+import { isCustomer, isItemOrder, isOrder, isOrderPayment, isOrderReview, isProduct, isRawObject } from "./typeCheckers";
 
 export const parseCustomer = (data: unknown) : data is RawCustomer => {
     if (isCustomer(data)) {
@@ -42,3 +43,10 @@ export const parseOrder = (data: unknown) : data is RawOrderReview => {
     }
     return false;
 };
+
+export const parseProduct = (data: unknown) : data is RawProduct => {
+    if (!isProduct(data)) {
+        return true;
+    }
+    return false;
+}
