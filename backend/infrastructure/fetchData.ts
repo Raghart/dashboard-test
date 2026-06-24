@@ -272,13 +272,13 @@ const buildCsvLayout = (): CsvData[] => {
 
                 await prisma.rawOrderReview.create({
                     data: {
-                        review_id: row.data?.review_id,
-                        order_id: row.data?.order_id,
-                        review_score: row.data?.review_score,
-                        review_comment_title: row.data?.review_comment_title,
-                        review_comment_message: row.data?.review_comment_message,
-                        review_creation_date: row.data?.review_creation_date,
-                        review_answer_timestamp: row.data?.review_answer_timestamp
+                        review_id: row.data?.review_id ?? null,
+                        order_id: row.data?.order_id ?? null,
+                        review_score: row.data?.review_score ?? null,
+                        review_comment_title: row.data?.review_comment_title ?? null,
+                        review_comment_message: row.data?.review_comment_message ?? null,
+                        review_creation_date: row.data?.review_creation_date ?? null,
+                        review_answer_timestamp: row.data?.review_answer_timestamp ?? null
                     }
                 });
             },
@@ -286,12 +286,23 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: ORDERSURL,
             label: "Orders",
-            stepFunc(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return
                 }
 
-                console.log(row.data)
+                await prisma.rawOrder.create({
+                    data:{
+                        order_id: row.data?.order_id ?? null,
+                        customer_id: row.data?.customer_id ?? null,
+                        order_status: row.data?.order_status ?? null,
+                        order_purchase_timestamp: row.data?.order_purchase_timestamp ?? null,
+                        order_approved_at: row.data?.order_approved_at ?? null,
+                        order_delivered_carrier_date: row.data?.order_delivered_carrier_date ?? null,
+                        order_delivered_customer_date: row.data?.order_delivered_customer_date ?? null,
+                        order_estimated_delivery_date: row.data?.order_estimated_delivery_date ?? null
+                    }
+                })
             },
         },
         {
