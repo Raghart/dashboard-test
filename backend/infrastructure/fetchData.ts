@@ -203,6 +203,7 @@ const fetchRawDatabaseData = async () : Promise<void> => {
 
 const buildCsvLayout = (): CsvData[] => {
     return [
+        /*
         {
             url: CUSTOMERURL, 
             label: "Customers", 
@@ -250,6 +251,18 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: ORDERSURL,
             label: "Orders",
+            stepFunc(row: Papa.ParseStepResult<unknown>) {
+                if (!parseRawObject(row.data)) {
+                    return
+                }
+
+                console.log(row.data)
+            },
+        },
+        */
+        {
+            url: PRODUCTSURL,
+            label: "Products",
             stepFunc(row: Papa.ParseStepResult<unknown>) {
                 if (!parseRawObject(row.data)) {
                     return
