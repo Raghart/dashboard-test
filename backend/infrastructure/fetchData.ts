@@ -206,12 +206,21 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: CUSTOMERURL, 
             label: "Customers", 
-            stepFunc: (row: Papa.ParseStepResult<unknown>) => {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return
                 }
 
-                console.log(row.data);
+                await prisma.rawCustomer.create({
+                    data: {
+                        customer_id: row.data?.customer_id ?? null,
+                        customer_unique_id: row.data?.customer_unique_id ?? null,
+                        customer_zip_code_prefix: row.data?.customer_zip_code_prefix ?? null,
+                        customer_city: row.data?.customer_city ?? null,
+                        customer_state: row.data?.customer_state ?? null, 
+                    }
+                });
+                console.log("Customer added!")
             }
         },
         {
