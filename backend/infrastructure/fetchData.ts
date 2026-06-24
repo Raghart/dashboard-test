@@ -269,6 +269,17 @@ const buildCsvLayout = (): CsvData[] => {
                 console.log(row.data)
             },
         },
+        {
+            url: SELLERSURL,
+            label: "Sellers",
+            stepFunc(row: Papa.ParseStepResult<unknown>) {
+                if (!parseRawObject(row.data)) {
+                    return
+                }
+
+                console.log(row.data)
+            },
+        },
     ]
 };
 
