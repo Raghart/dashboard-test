@@ -162,5 +162,5 @@ const fetchCategNames = async () => {
     });
 };
 
-const t = await fetchOrderPayments();
+const t = await fetchRawItemOrders();
 console.log(t);

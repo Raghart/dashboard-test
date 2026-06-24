@@ -90,5 +90,20 @@ model RawOrderPayment {
   payment_installments Int?
   payment_value Float?
 
+  @@map("orderPayments")
+  @@schema("raw")
+}
+
+model RawItemOrder {
+  id Int @id
+  order_item_id Int?
+  order_id String?
+  product_id String?
+  seller_id String?
+  shipping_limit_date DateTime?
+  price Float?
+  freight_value Float?
+  
+  @@map("itemOrders")
   @@schema("raw")
 }
