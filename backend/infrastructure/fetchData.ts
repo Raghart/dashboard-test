@@ -4,10 +4,24 @@ import { Readable } from "stream";
 import { RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
+import Papa from 'papaparse';
+import { isCustomer } from "../domain/typeCheckers";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
     return Readable.from(res.data);
+};
+
+const fetchCSVPaparse = async (url: string, stepFunc: (row: Papa.ParseStepResult<unknown>) => void) => {
+    const res = await axios.get(url);
+    Papa.parse(res.data, {
+        header: true,
+        dynamicTyping: true,
+        step: stepFunc,
+        complete: function() {
+            console.log("All done!")
+        }
+    });
 };
 
 const fetchCustomers = async () : Promise<RawCustomer[]> => {
@@ -186,4 +200,10 @@ const fetchRawDatabaseData = async () : Promise<void> => {
     ])
 };
 
-await fetchRawDatabaseData();
+await fetchCSVPaparse(CUSTOMERURL, (row: Papa.ParseStepResult<unknown>) => {
+    if (!isCustomer(row.data)) {
+        return
+    }
+});
+
+//await fetchRawDatabaseData();
