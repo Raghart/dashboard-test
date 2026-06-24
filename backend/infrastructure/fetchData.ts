@@ -226,12 +226,12 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: ITMORDERURL,
             label: "Item orders",
-            stepFunc: (row: Papa.ParseStepResult<unknown>) => {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return;
                 }
 
-                prisma.rawItemOrder.create({
+                await prisma.rawItemOrder.create({
                     data: {
                         order_id: row.data?.order_id ?? null,
                         order_item_id: row.data?.order_item_id ?? null,
