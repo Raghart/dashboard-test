@@ -5,8 +5,7 @@ import { CsvData, RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPay
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
-import { isCustomer } from "../domain/typeCheckers";
-import { parseCustomer, parseItemOrder, parseOrderPayment, parseRawObject } from "../domain/parseTypes";
+import { parseRawObject } from "../domain/parseTypes";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -266,12 +265,22 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: ORDREVIEWSURL,
             label: "Order reviews",
-            stepFunc(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return
                 }
 
-                console.log(row.data);
+                await prisma.rawOrderReview.create({
+                    data: {
+                        review_id: row.data?.review_id,
+                        order_id: row.data?.order_id,
+                        review_score: row.data?.review_score,
+                        review_comment_title: row.data?.review_comment_title,
+                        review_comment_message: row.data?.review_comment_message,
+                        review_creation_date: row.data?.review_creation_date,
+                        review_answer_timestamp: row.data?.review_answer_timestamp
+                    }
+                });
             },
         },
         {
