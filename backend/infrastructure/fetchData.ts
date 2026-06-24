@@ -1,7 +1,7 @@
 import axios from "axios";
 import csv from "csv-parser";
 import { Readable } from "stream";
-import { RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
+import { CsvData, RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
@@ -13,14 +13,14 @@ const fetchCSVData = async (url: string) : Promise<Readable> => {
     return Readable.from(res.data);
 };
 
-const fetchCSVPaparse = async (url: string, stepFunc: (row: Papa.ParseStepResult<unknown>) => void) => {
-    const res = await axios.get(url);
+const fetchCSVPaparse = async (dataStruct: CsvData) => {
+    const res = await axios.get(dataStruct.url);
     Papa.parse(res.data, {
         header: true,
         dynamicTyping: true,
-        step: stepFunc,
+        step: dataStruct.stepFunc,
         complete: function() {
-            console.log("All done!")
+            console.log(`${dataStruct.label} has processed correctly!`)
         }
     });
 };
@@ -201,12 +201,24 @@ const fetchRawDatabaseData = async () : Promise<void> => {
     ])
 };
 
-await fetchCSVPaparse(CUSTOMERURL, (row: Papa.ParseStepResult<unknown>) => {
-    if (!parseCustomer(row.data)) {
-        return
-    }
+const buildCsvLayout = (): CsvData[] => {
+    return [
+        {
+            url: CUSTOMERURL, 
+            label: "Customers", 
+            stepFunc: (row: Papa.ParseStepResult<unknown>) => {
+                if (!parseCustomer(row.data)) {
+                    return
+                }
 
-    console.log(row.data)
-});
+                console.log(row.data)
+            }
+        },
+    ]
+};
 
+const csvDataArr = buildCsvLayout();
+for (const dataStruct of csvDataArr) {
+    await fetchCSVPaparse(dataStruct);
+}
 //await fetchRawDatabaseData();
