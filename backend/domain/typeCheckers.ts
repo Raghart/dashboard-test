@@ -39,6 +39,16 @@ export const isOrder = (data: unknown) : boolean => {
     && "order_delivered_customer_date" in data && "order_estimated_delivery_date" in data;
 };
 
+export const isProduct = (data: unknown) : boolean => {
+    if (!data) return false;
+
+    return typeof data === "object" && "product_id" in data
+    && "product_category_name" in data && "product_name_lenght" in data 
+    && "product_description_lenght" in data && "product_photos_qty" in data 
+    && "product_weight_g" in data && "product_length_cm" in data 
+    && "product_height_cm" in data && "product_width_cm" in data;
+};
+
 export const isRawObject = (data: unknown) => {
     return data && typeof data === "object";
-}
+};

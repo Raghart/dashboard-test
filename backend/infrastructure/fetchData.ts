@@ -203,7 +203,6 @@ const fetchRawDatabaseData = async () : Promise<void> => {
 
 const buildCsvLayout = (): CsvData[] => {
     return [
-        /*
         {
             url: CUSTOMERURL, 
             label: "Customers", 
@@ -259,7 +258,6 @@ const buildCsvLayout = (): CsvData[] => {
                 console.log(row.data)
             },
         },
-        */
         {
             url: PRODUCTSURL,
             label: "Products",
