@@ -349,12 +349,17 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: CATNAMEURL,
             label: "Category names",
-            stepFunc(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return;
                 }
 
-                console.log(row.data)
+                await prisma.rawCategName.create({
+                    data: {
+                        product_category_name: row.data?.product_category_name ?? null,
+                        product_category_name_english: row.data?.product_category_name_english ?? null
+                    }
+                })
             },
         },
     ]
