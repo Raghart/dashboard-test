@@ -73,6 +73,6 @@ export interface CsvData<T> {
     url: string
     label: string
     dataArray: T[] 
-    stepFunc: (row: Papa.ParseStepResult<unknown>) => void
+    stepFunc: (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) => void
     completeFunc: () => void
 }

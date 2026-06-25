@@ -179,6 +179,7 @@ const fetchCategNames = async () => {
 
 const checkRawDatabase = async () : Promise<boolean> => {
     const customerCount = await prisma.rawCustomer.count();
+    console.log(customerCount)
     return customerCount === 0;
 };
 
@@ -205,7 +206,7 @@ const buildCsvLayout = () => {
         url: CUSTOMERURL, 
             label: "Customers", 
             dataArray: [],
-            stepFunc: function(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: async function(row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
                 if (!parseRawObject(row.data)) {
                     return
                 }
@@ -217,9 +218,19 @@ const buildCsvLayout = () => {
                     customer_city: row.data?.customer_city ?? null,
                     customer_state: row.data?.customer_state ?? null,
                 });
+
+                if (this.dataArray.length >= 1000) {
+                    parser.pause();
+
+                    await prisma.rawCustomer.createMany({
+                        data: this.dataArray,
+                    })
+
+                    this.dataArray = [];
+                    parser.resume();
+                }
             },
             completeFunc: async function() {
-                console.log(`Processing ${this.dataArray.length} datas in the array...`);
                 await prisma.rawCustomer.createMany({
                     data: this.dataArray,
                 })
