@@ -211,16 +211,19 @@ const buildCsvLayout = () => {
                 }
 
                 this.dataArray.push({
-                    customer_id: row.data?.customer_id ?? null,
+                    customer_id: row.data?.customer_id ?? "",
                     customer_unique_id: row.data?.customer_unique_id ?? null,
                     customer_zip_code_prefix: row.data?.customer_zip_code_prefix ?? null,
                     customer_city: row.data?.customer_city ?? null,
                     customer_state: row.data?.customer_state ?? null,
                 });
             },
-            completeFunc: function() {
-                console.log(this.dataArray.length)
-                console.log(`${this.label} has processed correctly!`)
+            completeFunc: async function() {
+                console.log(`Processing ${this.dataArray.length} datas in the array...`);
+                await prisma.rawCustomer.createMany({
+                    data: this.dataArray,
+                })
+                console.log(`${this.label} has been processed correctly!`);
             },
     }
     return [customerStruct,
