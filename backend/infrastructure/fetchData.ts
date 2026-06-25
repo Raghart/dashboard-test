@@ -6,19 +6,26 @@ import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVI
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
 import { parseRawObject } from "../domain/parseTypes";
+import { isRawObject } from "../domain/typeCheckers";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
     return Readable.from(res.data);
 };
 
-const fetchCSVPaparse = async (dataStruct: CsvData) => {
+const fetchCSVPaparse = async (dataStruct: CsvData<RawCustomer>) => {
     const res = await axios.get(dataStruct.url);
+    const rawDataArr: any[] = [];
+
     Papa.parse(res.data, {
         header: true,
-        dynamicTyping: true,
         step: dataStruct.stepFunc,
-        complete: function() {
+        complete: async () => {
+            console.log(`Processing ${rawDataArr.length} files...`)
+            await prisma.rawCustomer.createMany({
+                data: rawDataArr,
+            })
+           console.log(rawDataArr.length)
             console.log(`${dataStruct.label} has processed correctly!`)
         }
     });
@@ -200,28 +207,28 @@ const fetchRawDatabaseData = async () : Promise<void> => {
     ])
 };
 
-const buildCsvLayout = (): CsvData[] => {
+const buildCsvLayout = (): CsvData<RawCustomer>[] => {
     return [
         {
             url: CUSTOMERURL, 
             label: "Customers", 
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
+            dataArray: [],
+            stepFunc: async function(row: Papa.ParseStepResult<unknown>) {
                 if (!parseRawObject(row.data)) {
                     return
                 }
 
-                await prisma.rawCustomer.create({
-                    data: {
-                        customer_id: row.data?.customer_id ?? null,
-                        customer_unique_id: row.data?.customer_unique_id ?? null,
-                        customer_zip_code_prefix: row.data?.customer_zip_code_prefix ?? null,
-                        customer_city: row.data?.customer_city ?? null,
-                        customer_state: row.data?.customer_state ?? null, 
-                    }
+                this.dataArray.push({
+                    customer_id: row.data?.customer_id ?? null,
+                    customer_unique_id: row.data?.customer_unique_id ?? null,
+                    customer_zip_code_prefix: row.data?.customer_zip_code_prefix ?? null,
+                    customer_city: row.data?.customer_city ?? null,
+                    customer_state: row.data?.customer_state ?? null,
                 });
                 console.log("Customer added!")
             }
         },
+        /*
         {
             url: ITMORDERURL,
             label: "Item orders",
@@ -241,6 +248,7 @@ const buildCsvLayout = (): CsvData[] => {
                         freight_value: row.data?.freight_value ?? null,
                     }
                 })
+                console.log("Item order added!");
             }
         },
         {
@@ -260,6 +268,7 @@ const buildCsvLayout = (): CsvData[] => {
                         payment_value: row.data?.payment_value ?? null
                     }
                 })
+                console.log("Item payment added!");
             }
         },
         {
@@ -281,6 +290,7 @@ const buildCsvLayout = (): CsvData[] => {
                         review_answer_timestamp: row.data?.review_answer_timestamp ?? null
                     }
                 });
+                console.log("Order review added!");
             },
         },
         {
@@ -302,7 +312,8 @@ const buildCsvLayout = (): CsvData[] => {
                         order_delivered_customer_date: row.data?.order_delivered_customer_date ?? null,
                         order_estimated_delivery_date: row.data?.order_estimated_delivery_date ?? null
                     }
-                })
+                });
+                console.log("Orders added!");
             },
         },
         {
@@ -326,6 +337,7 @@ const buildCsvLayout = (): CsvData[] => {
                         product_width_cm: row.data?.product_width_cm ?? null
                     }
                 });
+                console.log("Products added!");
             },
         },
         {
@@ -343,9 +355,11 @@ const buildCsvLayout = (): CsvData[] => {
                         seller_city: row.data?.seller_city ?? null,
                         seller_state: row.data?.seller_state ?? null
                     }
-                })
+                });
+                console.log("Sellers added!");
             },
         },
+        /*
         {
             url: CATNAMEURL,
             label: "Category names",
@@ -359,14 +373,23 @@ const buildCsvLayout = (): CsvData[] => {
                         product_category_name: row.data?.product_category_name ?? null,
                         product_category_name_english: row.data?.product_category_name_english ?? null
                     }
-                })
+                });
+                console.log("Category name added!");
             },
         },
+        */
     ]
 };
 
-const csvDataArr = buildCsvLayout();
-for (const dataStruct of csvDataArr) {
-    await fetchCSVPaparse(dataStruct);
-}
+const fetchData = async () => {
+    const csvDataArr = buildCsvLayout();
+    console.log(await checkRawDatabase());
+    return
+    console.log("Starting to iterate!")
+    for (const dataStruct of csvDataArr) {
+        await fetchCSVPaparse(dataStruct);
+    }
+};
+
+await fetchData();
 //await fetchRawDatabaseData();

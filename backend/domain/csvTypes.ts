@@ -69,8 +69,9 @@ export interface RawCategName {
     product_category_name_english: string
 };
 
-export interface CsvData {
+export interface CsvData<T> {
     url: string
     label: string
+    dataArray: T[] 
     stepFunc: (row: Papa.ParseStepResult<unknown>) => void
 }
