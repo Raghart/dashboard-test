@@ -15,19 +15,12 @@ const fetchCSVData = async (url: string) : Promise<Readable> => {
 
 const fetchCSVPaparse = async (dataStruct: CsvData<RawCustomer>) => {
     const res = await axios.get(dataStruct.url);
-    const rawDataArr: any[] = [];
 
     Papa.parse(res.data, {
         header: true,
-        step: dataStruct.stepFunc,
-        complete: async () => {
-            console.log(`Processing ${rawDataArr.length} files...`)
-            await prisma.rawCustomer.createMany({
-                data: rawDataArr,
-            })
-           console.log(rawDataArr.length)
-            console.log(`${dataStruct.label} has processed correctly!`)
-        }
+        dynamicTyping: true,
+        step: dataStruct.stepFunc.bind(dataStruct),
+        complete: dataStruct.completeFunc.bind(dataStruct),
     });
 };
 
@@ -207,13 +200,12 @@ const fetchRawDatabaseData = async () : Promise<void> => {
     ])
 };
 
-const buildCsvLayout = (): CsvData<RawCustomer>[] => {
-    return [
-        {
-            url: CUSTOMERURL, 
+const buildCsvLayout = () => {
+    const customerStruct : CsvData<RawCustomer> = {
+        url: CUSTOMERURL, 
             label: "Customers", 
             dataArray: [],
-            stepFunc: async function(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: function(row: Papa.ParseStepResult<unknown>) {
                 if (!parseRawObject(row.data)) {
                     return
                 }
@@ -225,9 +217,13 @@ const buildCsvLayout = (): CsvData<RawCustomer>[] => {
                     customer_city: row.data?.customer_city ?? null,
                     customer_state: row.data?.customer_state ?? null,
                 });
-                console.log("Customer added!")
-            }
-        },
+            },
+            completeFunc: function() {
+                console.log(this.dataArray.length)
+                console.log(`${this.label} has processed correctly!`)
+            },
+    }
+    return [customerStruct,
         /*
         {
             url: ITMORDERURL,
@@ -383,8 +379,6 @@ const buildCsvLayout = (): CsvData<RawCustomer>[] => {
 
 const fetchData = async () => {
     const csvDataArr = buildCsvLayout();
-    console.log(await checkRawDatabase());
-    return
     console.log("Starting to iterate!")
     for (const dataStruct of csvDataArr) {
         await fetchCSVPaparse(dataStruct);

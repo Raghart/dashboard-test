@@ -74,4 +74,5 @@ export interface CsvData<T> {
     label: string
     dataArray: T[] 
     stepFunc: (row: Papa.ParseStepResult<unknown>) => void
+    completeFunc: () => void
 }
