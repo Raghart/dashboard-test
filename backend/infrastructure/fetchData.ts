@@ -331,12 +331,19 @@ const buildCsvLayout = (): CsvData[] => {
         {
             url: SELLERSURL,
             label: "Sellers",
-            stepFunc(row: Papa.ParseStepResult<unknown>) {
+            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
                 if (!parseRawObject(row.data)) {
                     return
                 }
 
-                console.log(row.data)
+                await prisma.rawSeller.create({
+                    data: {
+                        seller_id: row.data?.seller_id ?? null,
+                        seller_zip_code_prefix: row.data?.seller_zip_code_prefix ?? null,
+                        seller_city: row.data?.seller_city ?? null,
+                        seller_state: row.data?.seller_state ?? null
+                    }
+                })
             },
         },
         {
