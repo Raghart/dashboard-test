@@ -11,7 +11,7 @@ export interface RawItemOrder {
     order_item_id: number,
     product_id: string,
     seller_id: string,
-    shipping_limit_date: Date,
+    shipping_limit_date: Date | null,
     price: number,
     freight_value: number
 }

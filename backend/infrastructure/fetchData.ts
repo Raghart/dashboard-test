@@ -13,7 +13,7 @@ const fetchCSVData = async (url: string) : Promise<Readable> => {
     return Readable.from(res.data);
 };
 
-const fetchCSVPaparse = async (dataStruct: CsvData<RawCustomer>) => {
+const fetchCSVPaparse = async (dataStruct: CsvData<any>) => {
     const res = await axios.get(dataStruct.url);
 
     Papa.parse(res.data, {
@@ -178,7 +178,7 @@ const fetchCategNames = async () => {
 };
 
 const checkRawDatabase = async () : Promise<boolean> => {
-    const customerCount = await prisma.rawCustomer.count();
+    const customerCount = await prisma.rawItemOrder.count();
     console.log(customerCount)
     return customerCount === 0;
 };
@@ -237,30 +237,50 @@ const buildCsvLayout = () => {
                 console.log(`${this.label} has been processed correctly!`);
             },
     }
-    return [customerStruct,
-        /*
-        {
-            url: ITMORDERURL,
+
+    const itemOrderStruct: CsvData<RawItemOrder> = {
+        url: ITMORDERURL,
             label: "Item orders",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
+            dataArray: [],
+            stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
                 if (!parseRawObject(row.data)) {
                     return;
                 }
 
-                await prisma.rawItemOrder.create({
-                    data: {
-                        order_id: row.data?.order_id ?? null,
-                        order_item_id: row.data?.order_item_id ?? null,
-                        product_id: row.data?.product_id ?? null,
-                        seller_id: row.data?.seller_id ?? null,
-                        shipping_limit_date: row.data?.shipping_limit_date ?? null,
-                        price: row.data?.price ?? null,
-                        freight_value: row.data?.freight_value ?? null,
-                    }
-                })
-                console.log("Item order added!");
+                this.dataArray.push({
+                    order_id: row.data?.order_id ?? "",
+                    order_item_id: row.data?.order_item_id ?? null,
+                    product_id: row.data?.product_id ?? null,
+                    seller_id: row.data?.seller_id ?? null,
+                    shipping_limit_date: row.data.shipping_limit_date 
+                        ? new Date(row.data?.shipping_limit_date) : null,
+                    price: row.data?.price ?? null,
+                    freight_value: row.data?.freight_value ?? null,
+                });
+
+                if (this.dataArray.length >= 1000) {
+                    parser.pause();
+
+                    await prisma.rawItemOrder.createMany({
+                        data: this.dataArray,
+                    });
+
+                    this.dataArray = [];
+                    parser.resume();
+                }
+                
+            },
+            completeFunc: async function() {
+                await prisma.rawItemOrder.createMany({
+                    data: this.dataArray,
+                });
+                console.log(`Data from ${this.label} has been processed!`)
             }
-        },
+    };
+    return [
+        //customerStruct,
+        itemOrderStruct,
+        /*
         {
             url: ORDPAYMENTURL,
             label: "Order payments",
