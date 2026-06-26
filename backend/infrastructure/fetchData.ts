@@ -461,33 +461,52 @@ const buildCsvLayout = () => {
             console.log(`${this.label} data has been processed!`);
         },
     };
+
+    const sellersStruct: CsvData<RawSeller> = {
+        url: SELLERSURL,
+        label: "Sellers",
+        dataArray: [],
+        stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
+            if (!parseRawObject(row.data)) {
+                return
+            }
+
+            this.dataArray.push({
+                seller_id: row.data?.seller_id ?? "",
+                seller_zip_code_prefix: row.data?.seller_zip_code_prefix ?? null,
+                seller_city: typeof row.data?.seller_city === "string" ?
+                    row.data.seller_city : null,
+                seller_state: row.data?.seller_state ?? null
+            });
+
+            if (this.dataArray.length >= 1000) {
+                parser.pause();
+
+                await prisma.rawSeller.createMany({
+                    data: this.dataArray,
+                })
+
+                this.dataArray = [];
+                parser.resume();
+            }
+        },
+        completeFunc: async function() {
+            if (this.dataArray.length > 0) {
+                await prisma.rawSeller.createMany({
+                    data: this.dataArray,
+                })
+            }
+            console.log(`${this.label} data has been processed!`);
+        },
+    };
     return [
         //customerStruct,
         //itemOrderStruct,
         //orderPaymentStruct,
         //orderReviewsStruct,
         //ordersStruct,
-        productsStruct,
-        /*
-        {
-            url: SELLERSURL,
-            label: "Sellers",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseRawObject(row.data)) {
-                    return
-                }
-
-                await prisma.rawSeller.create({
-                    data: {
-                        seller_id: row.data?.seller_id ?? null,
-                        seller_zip_code_prefix: row.data?.seller_zip_code_prefix ?? null,
-                        seller_city: row.data?.seller_city ?? null,
-                        seller_state: row.data?.seller_state ?? null
-                    }
-                });
-                console.log("Sellers added!");
-            },
-        },
+        //productsStruct,
+        sellersStruct,
         /*
         {
             url: CATNAMEURL,
