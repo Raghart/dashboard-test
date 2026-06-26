@@ -28,4 +28,20 @@ const buildCleanCategNames = async () => {
     console.log("The Clean Category names table has been processed!")
 };
 
-console.log(await checkCleanDatabase())
+const buildCleanLayer = async () => {
+    const isClean = await checkCleanDatabase()
+    if (!isClean) {
+        console.log("clean table already has data in it!");
+        return;
+    }
+
+    const buildCleanFuncs = [
+        buildCleanCategNames,
+    ];
+
+    for (const cleanFunc of buildCleanFuncs) {
+        await cleanFunc();
+    }
+};
+
+await buildCleanLayer()
