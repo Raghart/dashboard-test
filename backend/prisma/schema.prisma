@@ -85,7 +85,8 @@ model RawOrderReview {
 }
 
 model RawOrderPayment {
-  order_id String @id
+  id Int @id @default(autoincrement())
+  order_id String?
   payment_sequential Int?
   payment_type String?
   payment_installments Int?

@@ -19,6 +19,7 @@ const fetchCSVPaparse = async (dataStruct: CsvData<any>) => {
     Papa.parse(res.data, {
         header: true,
         dynamicTyping: true,
+        skipEmptyLines: "greedy",
         step: dataStruct.stepFunc.bind(dataStruct),
         complete: dataStruct.completeFunc.bind(dataStruct),
     });
@@ -274,33 +275,53 @@ const buildCsvLayout = () => {
                 await prisma.rawItemOrder.createMany({
                     data: this.dataArray,
                 });
-                console.log(`Data from ${this.label} has been processed!`)
+                console.log(`${this.label} data has been processed!`)
             }
+    };
+
+    const orderPaymentStruct: CsvData<RawOrderPayment> = {
+        url: ORDPAYMENTURL,
+        label: "Order payments",
+        dataArray: [],
+        stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
+            if (!parseRawObject(row.data)) {
+                return;
+            }
+
+            this.dataArray.push({
+                order_id: row.data?.order_id ?? null,
+                payment_sequential: row.data?.payment_sequential ?? null,
+                payment_type: row.data?.payment_type ?? null,
+                payment_installments: typeof row.data.payment_installments === "number" ?
+                     row.data?.payment_installments : null,
+                payment_value: row.data?.payment_value ?? null
+            });
+
+            if (this.dataArray.length >= 1000) {
+                parser.pause();
+
+                await prisma.rawOrderPayment.createMany({
+                    data: this.dataArray,
+                })
+
+                this.dataArray = [];
+                parser.resume();
+            }
+        },
+        completeFunc: async function() {
+            if (this.dataArray.length > 0) {
+                await prisma.rawOrderPayment.createMany({
+                    data: this.dataArray,
+                })
+            }
+            console.log(`${this.label} data has been processed!`)
+        },
     };
     return [
         //customerStruct,
-        itemOrderStruct,
+        //itemOrderStruct,
+        orderPaymentStruct,
         /*
-        {
-            url: ORDPAYMENTURL,
-            label: "Order payments",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseRawObject(row.data)) {
-                    return;
-                }
-
-                await prisma.rawOrderPayment.create({
-                    data: {
-                        order_id: row.data?.order_id ?? null,
-                        payment_sequential: row.data?.payment_sequential ?? null,
-                        payment_type: row.data?.payment_type ?? null,
-                        payment_installments: row.data?.payment_installments ?? null,
-                        payment_value: row.data?.payment_value ?? null
-                    }
-                })
-                console.log("Item payment added!");
-            }
-        },
         {
             url: ORDREVIEWSURL,
             label: "Order reviews",
