@@ -34,14 +34,6 @@ model RawSeller {
     @@schema("raw")
 }
 
-model RawCategName {
-  product_category_name String @id
-  product_category_name_english String?
-
-  @@map("categoryNames")
-  @@schema("raw")
-}
-
 model RawProduct {
   product_id String @id
   product_category_name String?
@@ -109,4 +101,20 @@ model RawItemOrder {
   
   @@map("itemOrders")
   @@schema("raw")
+}
+
+model RawCategName {
+  product_category_name String @id
+  product_category_name_english String?
+
+  @@map("categoryNames")
+  @@schema("raw")
+}
+
+model CleanCategName {
+  product_category_name String @id
+  product_category_name_english String
+
+  @@map("categoryNames")
+  @@schema("clean")
 }
