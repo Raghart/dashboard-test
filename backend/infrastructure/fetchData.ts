@@ -179,7 +179,7 @@ const fetchCategNames = async () => {
 };
 
 const checkRawDatabase = async () : Promise<boolean> => {
-    const customerCount = await prisma.rawItemOrder.count();
+    const customerCount = await prisma.rawOrderPayment.count();
     console.log(customerCount)
     return customerCount === 0;
 };
@@ -232,9 +232,11 @@ const buildCsvLayout = () => {
                 }
             },
             completeFunc: async function() {
-                await prisma.rawCustomer.createMany({
-                    data: this.dataArray,
-                })
+                if (this.dataArray.length > 0) {
+                    await prisma.rawCustomer.createMany({
+                        data: this.dataArray,
+                    })
+                }
                 console.log(`${this.label} has been processed correctly!`);
             },
     }
@@ -317,6 +319,10 @@ const buildCsvLayout = () => {
             console.log(`${this.label} data has been processed!`)
         },
     };
+
+    const orderReviewsStruct = {
+
+    }
     return [
         //customerStruct,
         //itemOrderStruct,
