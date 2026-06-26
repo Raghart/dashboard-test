@@ -332,11 +332,13 @@ const buildCsvLayout = () => {
             }
 
             this.dataArray.push({
-                review_id: row.data?.review_id ?? "",
+                review_id: row.data?.review_id ?? null,
                 order_id: row.data?.order_id ?? null,
                 review_score: row.data?.review_score ?? null,
-                review_comment_title: row.data?.review_comment_title ?? null,
-                review_comment_message: row.data?.review_comment_message ?? null,
+                review_comment_title: row.data?.review_comment_title ? 
+                    `${row.data.review_comment_title}` : null,
+                review_comment_message: row.data?.review_comment_message ? 
+                    `${row.data.review_comment_message}` : null,
                 review_creation_date: row.data?.review_creation_date ? 
                     new Date(row.data.review_creation_date) : null,
                 review_answer_timestamp: row.data?.review_answer_timestamp ? 
@@ -348,7 +350,7 @@ const buildCsvLayout = () => {
 
                 await prisma.rawOrderReview.createMany({
                     data: this.dataArray,
-                })
+                });
 
                 this.dataArray = [];
                 parser.resume();
@@ -358,7 +360,7 @@ const buildCsvLayout = () => {
             if (this.dataArray.length > 0) {
                 await prisma.rawOrderReview.createMany({
                     data: this.dataArray,
-                })
+                });
             }
             console.log(`${this.label} data has been processed!`);
         },

@@ -72,7 +72,8 @@ model RawOrder {
 }
 
 model RawOrderReview {
-  review_id String @id
+  id Int @id @default(autoincrement())
+  review_id String?
   order_id String?
   review_score Int?
   review_comment_title String?
