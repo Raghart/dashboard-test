@@ -425,13 +425,20 @@ const buildCsvLayout = () => {
             this.dataArray.push({
                 product_id: row.data?.product_id ?? "",
                 product_category_name: row.data?.product_category_name ?? null,
-                product_name_lenght: row.data?.product_name_lenght ?? null,
-                product_description_lenght: row.data?.product_description_lenght ?? null,
-                product_photos_qty: row.data?.product_photos_qty ?? null,
-                product_weight_g: row.data?.product_weight_g ?? null,
-                product_length_cm: row.data?.product_length_cm ?? null,
-                product_height_cm: row.data?.product_height_cm ?? null,
-                product_width_cm: row.data?.product_width_cm ?? null
+                product_name_lenght: typeof row.data?.product_name_lenght === "number" ?
+                    row.data.product_name_lenght : null,
+                product_description_lenght: typeof row.data?.product_description_lenght === "number" ?
+                    row.data.product_description_lenght : null,
+                product_photos_qty: typeof row.data?.product_photos_qty === "number" ?
+                    row.data.product_photos_qty : null,
+                product_weight_g: typeof row.data?.product_weight_g === "number" ?
+                    row.data.product_weight_g : null,
+                product_length_cm: typeof row.data?.product_length_cm === "number" ?
+                    row.data.product_length_cm : null,
+                product_height_cm: typeof row.data?.product_height_cm === "number" ? 
+                    row.data.product_height_cm : null,
+                product_width_cm: typeof row.data?.product_width_cm === "number" ?
+                    row.data.product_width_cm : null
             });
 
             if (this.dataArray.length >= 1000) {
