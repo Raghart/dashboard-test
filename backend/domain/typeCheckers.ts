@@ -67,3 +67,8 @@ export const isCategoryName = (data: unknown) : boolean => {
 export const isRawObject = (data: unknown) => {
     return data && typeof data === "object";
 };
+
+export const isString = (data: unknown) : data is string => {
+    if (!data) return false;
+    return typeof data === "string" && data.trim() !== "";
+};
