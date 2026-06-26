@@ -7,6 +7,7 @@ import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
 import { parseRawObject } from "../domain/parseTypes";
 import { isRawObject } from "../domain/typeCheckers";
+import { isDate } from "util/types";
 
 const fetchCSVData = async (url: string) : Promise<Readable> => {
     const res = await axios.get(url);
@@ -373,17 +374,22 @@ const buildCsvLayout = () => {
         stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
             if (!parseRawObject(row.data)) {
                 return
-            }
+            };
 
             this.dataArray.push({
                 order_id: row.data?.order_id ?? "",
                 customer_id: row.data?.customer_id ?? null,
                 order_status: row.data?.order_status ?? null,
-                order_purchase_timestamp: row.data?.order_purchase_timestamp ?? null,
-                order_approved_at: row.data?.order_approved_at ?? null,
-                order_delivered_carrier_date: row.data?.order_delivered_carrier_date ?? null,
-                order_delivered_customer_date: row.data?.order_delivered_customer_date ?? null,
-                order_estimated_delivery_date: row.data?.order_estimated_delivery_date ?? null
+                order_purchase_timestamp: row.data?.order_purchase_timestamp ?
+                    new Date(row.data.order_purchase_timestamp) : null,
+                order_approved_at: isDate(new Date(row.data?.order_approved_at)) ?
+                    new Date(row.data.order_approved_at) : null,
+                order_delivered_carrier_date: row.data?.order_delivered_carrier_date ?
+                     new Date(row.data.order_delivered_carrier_date) : null,
+                order_delivered_customer_date: row.data?.order_delivered_customer_date ?
+                    new Date(row.data.order_delivered_customer_date) : null,
+                order_estimated_delivery_date: row.data?.order_estimated_delivery_date ?
+                    new Date(row.data.order_estimated_delivery_date) : null,
             })
 
             if (this.dataArray.length >= 1000) {

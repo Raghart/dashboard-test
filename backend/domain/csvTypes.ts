@@ -38,11 +38,11 @@ export interface RawOrder {
     order_id: string,
     customer_id: string,
     order_status: string,
-    order_purchase_timestamp: Date,
-    order_approved_at: Date,
-    order_delivered_carrier_date: Date,
-    order_delivered_customer_date: Date,
-    order_estimated_delivery_date: Date
+    order_purchase_timestamp: Date | null,
+    order_approved_at: Date | null,
+    order_delivered_carrier_date: Date | null,
+    order_delivered_customer_date: Date | null,
+    order_estimated_delivery_date: Date | null
 };
 
 export interface RawProduct {
