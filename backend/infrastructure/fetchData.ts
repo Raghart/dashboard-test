@@ -535,26 +535,28 @@ const buildCsvLayout = () => {
     };
 
     return [
-        //customerStruct,
-        //itemOrderStruct,
-        //orderPaymentStruct,
-        //orderReviewsStruct,
-        //ordersStruct,
-        //productsStruct,
-        //sellersStruct,
+        customerStruct,
+        itemOrderStruct,
+        orderPaymentStruct,
+        orderReviewsStruct,
+        ordersStruct,
+        productsStruct,
+        sellersStruct,
         categNamesStruct,
     ]
 };
 
-const fetchData = async () => {
-    console.log(await checkRawDatabase())
-    return
+const buildRawDB = async () => {
     const csvDataArr = buildCsvLayout();
+    if (!await checkRawDatabase()) {
+        console.log("Raw database already has the CSV information loaded!")
+        return
+    }
+
     console.log("Starting to iterate!")
     for (const dataStruct of csvDataArr) {
         await fetchCSVPaparse(dataStruct);
     }
 };
 
-await fetchData();
-//await fetchRawDatabaseData();
+await buildRawDB();
