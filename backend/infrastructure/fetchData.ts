@@ -5,7 +5,7 @@ import { CsvData, RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPay
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
-import { parseRawObject } from "../domain/parseTypes";
+import { parseRawDate, parseRawObject } from "../domain/parseTypes";
 import { isRawObject } from "../domain/typeCheckers";
 import { isDate } from "util/types";
 
@@ -382,8 +382,7 @@ const buildCsvLayout = () => {
                 order_status: row.data?.order_status ?? null,
                 order_purchase_timestamp: row.data?.order_purchase_timestamp ?
                     new Date(row.data.order_purchase_timestamp) : null,
-                order_approved_at: isDate(new Date(row.data?.order_approved_at)) ?
-                    new Date(row.data.order_approved_at) : null,
+                order_approved_at: parseRawDate(row.data?.order_approved_at),
                 order_delivered_carrier_date: row.data?.order_delivered_carrier_date ?
                      new Date(row.data.order_delivered_carrier_date) : null,
                 order_delivered_customer_date: row.data?.order_delivered_customer_date ?
