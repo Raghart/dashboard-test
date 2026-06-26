@@ -318,40 +318,57 @@ const buildCsvLayout = () => {
                     data: this.dataArray,
                 })
             }
-            console.log(`${this.label} data has been processed!`)
+            console.log(`${this.label} data has been processed!`);
         },
     };
 
-    const orderReviewsStruct = {
+    const orderReviewsStruct: CsvData<RawOrderReview> = {
+        url: ORDREVIEWSURL,
+        label: "Order reviews",
+        dataArray: [],
+        stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
+            if (!parseRawObject(row.data)) {
+                return
+            }
 
+            this.dataArray.push({
+                review_id: row.data?.review_id ?? "",
+                order_id: row.data?.order_id ?? null,
+                review_score: row.data?.review_score ?? null,
+                review_comment_title: row.data?.review_comment_title ?? null,
+                review_comment_message: row.data?.review_comment_message ?? null,
+                review_creation_date: row.data?.review_creation_date ? 
+                    new Date(row.data.review_creation_date) : null,
+                review_answer_timestamp: row.data?.review_answer_timestamp ? 
+                    new Date(row.data.review_answer_timestamp) : null
+            });
+
+            if (this.dataArray.length >= 1000) {
+                parser.pause();
+
+                await prisma.rawOrderReview.createMany({
+                    data: this.dataArray,
+                })
+
+                this.dataArray = [];
+                parser.resume();
+            }
+        },
+        completeFunc: async function() {
+            if (this.dataArray.length > 0) {
+                await prisma.rawOrderReview.createMany({
+                    data: this.dataArray,
+                })
+            }
+            console.log(`${this.label} data has been processed!`);
+        },
     }
     return [
         //customerStruct,
         //itemOrderStruct,
-        orderPaymentStruct,
+        //orderPaymentStruct,
+        orderReviewsStruct,
         /*
-        {
-            url: ORDREVIEWSURL,
-            label: "Order reviews",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseRawObject(row.data)) {
-                    return
-                }
-
-                await prisma.rawOrderReview.create({
-                    data: {
-                        review_id: row.data?.review_id ?? null,
-                        order_id: row.data?.order_id ?? null,
-                        review_score: row.data?.review_score ?? null,
-                        review_comment_title: row.data?.review_comment_title ?? null,
-                        review_comment_message: row.data?.review_comment_message ?? null,
-                        review_creation_date: row.data?.review_creation_date ?? null,
-                        review_answer_timestamp: row.data?.review_answer_timestamp ?? null
-                    }
-                });
-                console.log("Order review added!");
-            },
-        },
         {
             url: ORDERSURL,
             label: "Orders",

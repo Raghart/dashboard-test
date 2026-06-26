@@ -30,8 +30,8 @@ export interface RawOrderReview {
     review_score: number,
     review_comment_title: string,
     review_comment_message: string,
-    review_creation_date: Date,
-    review_answer_timestamp: Date
+    review_creation_date: Date | null,
+    review_answer_timestamp: Date | null
 };
 
 export interface RawOrder {
