@@ -179,7 +179,7 @@ const fetchCategNames = async () => {
 };
 
 const checkRawDatabase = async () : Promise<boolean> => {
-    const customerCount = await prisma.rawOrderPayment.count();
+    const customerCount = await prisma.rawOrderReview.count();
     console.log(customerCount)
     return customerCount === 0;
 };
@@ -364,36 +364,56 @@ const buildCsvLayout = () => {
             }
             console.log(`${this.label} data has been processed!`);
         },
-    }
+    };
+
+    const ordersStruct: CsvData<RawOrder> = {
+        url: ORDERSURL,
+        label: "Orders",
+        dataArray: [],
+        stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
+            if (!parseRawObject(row.data)) {
+                return
+            }
+
+            this.dataArray.push({
+                order_id: row.data?.order_id ?? "",
+                customer_id: row.data?.customer_id ?? null,
+                order_status: row.data?.order_status ?? null,
+                order_purchase_timestamp: row.data?.order_purchase_timestamp ?? null,
+                order_approved_at: row.data?.order_approved_at ?? null,
+                order_delivered_carrier_date: row.data?.order_delivered_carrier_date ?? null,
+                order_delivered_customer_date: row.data?.order_delivered_customer_date ?? null,
+                order_estimated_delivery_date: row.data?.order_estimated_delivery_date ?? null
+            })
+
+            if (this.dataArray.length >= 1000) {
+                parser.pause();
+
+                await prisma.rawOrder.createMany({
+                    data: this.dataArray,
+                });
+
+                this.dataArray = [];
+                parser.resume();
+            }
+            
+        },
+        completeFunc: async function() {
+            if (this.dataArray.length > 0) {
+                await prisma.rawOrder.createMany({
+                    data: this.dataArray,
+                });
+            }
+            console.log(`${this.label} data has been processed!`);
+        },
+    };
     return [
         //customerStruct,
         //itemOrderStruct,
         //orderPaymentStruct,
-        orderReviewsStruct,
+        //orderReviewsStruct,
+        ordersStruct,
         /*
-        {
-            url: ORDERSURL,
-            label: "Orders",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseRawObject(row.data)) {
-                    return
-                }
-
-                await prisma.rawOrder.create({
-                    data:{
-                        order_id: row.data?.order_id ?? null,
-                        customer_id: row.data?.customer_id ?? null,
-                        order_status: row.data?.order_status ?? null,
-                        order_purchase_timestamp: row.data?.order_purchase_timestamp ?? null,
-                        order_approved_at: row.data?.order_approved_at ?? null,
-                        order_delivered_carrier_date: row.data?.order_delivered_carrier_date ?? null,
-                        order_delivered_customer_date: row.data?.order_delivered_customer_date ?? null,
-                        order_estimated_delivery_date: row.data?.order_estimated_delivery_date ?? null
-                    }
-                });
-                console.log("Orders added!");
-            },
-        },
         {
             url: PRODUCTSURL,
             label: "Products",
