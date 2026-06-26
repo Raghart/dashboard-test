@@ -180,8 +180,7 @@ const fetchCategNames = async () => {
 };
 
 const checkRawDatabase = async () : Promise<boolean> => {
-    const customerCount = await prisma.rawOrder.count();
-    console.log(customerCount)
+    const customerCount = await prisma.rawCustomer.count();
     return customerCount === 0;
 };
 
@@ -499,6 +498,42 @@ const buildCsvLayout = () => {
             console.log(`${this.label} data has been processed!`);
         },
     };
+
+    const categNamesStruct: CsvData<RawCategName> = {
+        url: CATNAMEURL,
+        dataArray: [],
+        label: "Category names",
+        stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
+            if (!parseRawObject(row.data)) {
+                return;
+            }
+
+            this.dataArray.push({
+                product_category_name: row.data?.product_category_name ?? null,
+                product_category_name_english: row.data?.product_category_name_english ?? null
+            });
+
+            if (this.dataArray.length >= 1000) {
+                parser.pause();
+
+                await prisma.rawCategName.createMany({
+                    data: this.dataArray,
+                })
+
+                this.dataArray = [];
+                parser.resume();
+            }
+        },
+        completeFunc: async function() {
+            if (this.dataArray.length > 0) {
+                await prisma.rawCategName.createMany({
+                    data: this.dataArray,
+                });
+            }
+            console.log(`${this.label} data has been processed!`);
+        },
+    };
+
     return [
         //customerStruct,
         //itemOrderStruct,
@@ -506,30 +541,14 @@ const buildCsvLayout = () => {
         //orderReviewsStruct,
         //ordersStruct,
         //productsStruct,
-        sellersStruct,
-        /*
-        {
-            url: CATNAMEURL,
-            label: "Category names",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseRawObject(row.data)) {
-                    return;
-                }
-
-                await prisma.rawCategName.create({
-                    data: {
-                        product_category_name: row.data?.product_category_name ?? null,
-                        product_category_name_english: row.data?.product_category_name_english ?? null
-                    }
-                });
-                console.log("Category name added!");
-            },
-        },
-        */
+        //sellersStruct,
+        categNamesStruct,
     ]
 };
 
 const fetchData = async () => {
+    console.log(await checkRawDatabase())
+    return
     const csvDataArr = buildCsvLayout();
     console.log("Starting to iterate!")
     for (const dataStruct of csvDataArr) {
