@@ -180,7 +180,7 @@ const fetchCategNames = async () => {
 };
 
 const checkRawDatabase = async () : Promise<boolean> => {
-    const customerCount = await prisma.rawOrderReview.count();
+    const customerCount = await prisma.rawOrder.count();
     console.log(customerCount)
     return customerCount === 0;
 };
@@ -412,37 +412,56 @@ const buildCsvLayout = () => {
             console.log(`${this.label} data has been processed!`);
         },
     };
+
+    const productsStruct: CsvData<RawProduct> = {
+        url: PRODUCTSURL,
+        label: "Products",
+        dataArray: [],
+        stepFunc: async function (row: Papa.ParseStepResult<unknown>, parser: Papa.Parser) {
+            if (!parseRawObject(row.data)) {
+                return
+            }
+
+            this.dataArray.push({
+                product_id: row.data?.product_id ?? "",
+                product_category_name: row.data?.product_category_name ?? null,
+                product_name_lenght: row.data?.product_name_lenght ?? null,
+                product_description_lenght: row.data?.product_description_lenght ?? null,
+                product_photos_qty: row.data?.product_photos_qty ?? null,
+                product_weight_g: row.data?.product_weight_g ?? null,
+                product_length_cm: row.data?.product_length_cm ?? null,
+                product_height_cm: row.data?.product_height_cm ?? null,
+                product_width_cm: row.data?.product_width_cm ?? null
+            });
+
+            if (this.dataArray.length >= 1000) {
+                parser.pause();
+
+                await prisma.rawProduct.createMany({
+                    data: this.dataArray,
+                })
+                
+                this.dataArray = [];
+                parser.resume();
+            }
+        },
+        completeFunc: async function() {
+            if (this.dataArray.length > 0) {
+                await prisma.rawProduct.createMany({
+                    data: this.dataArray,
+                })
+            }
+            console.log(`${this.label} data has been processed!`);
+        },
+    };
     return [
         //customerStruct,
         //itemOrderStruct,
         //orderPaymentStruct,
         //orderReviewsStruct,
-        ordersStruct,
+        //ordersStruct,
+        productsStruct,
         /*
-        {
-            url: PRODUCTSURL,
-            label: "Products",
-            stepFunc: async (row: Papa.ParseStepResult<unknown>) => {
-                if (!parseRawObject(row.data)) {
-                    return
-                }
-
-                await prisma.rawProduct.create({
-                    data: {
-                        product_id: row.data?.product_id ?? null,
-                        product_category_name: row.data?.product_category_name ?? null,
-                        product_name_lenght: row.data?.product_name_lenght ?? null,
-                        product_description_lenght: row.data?.product_description_lenght ?? null,
-                        product_photos_qty: row.data?.product_photos_qty ?? null,
-                        product_weight_g: row.data?.product_weight_g ?? null,
-                        product_length_cm: row.data?.product_length_cm ?? null,
-                        product_height_cm: row.data?.product_height_cm ?? null,
-                        product_width_cm: row.data?.product_width_cm ?? null
-                    }
-                });
-                console.log("Products added!");
-            },
-        },
         {
             url: SELLERSURL,
             label: "Sellers",
