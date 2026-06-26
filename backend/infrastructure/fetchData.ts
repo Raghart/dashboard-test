@@ -274,9 +274,11 @@ const buildCsvLayout = () => {
                 
             },
             completeFunc: async function() {
-                await prisma.rawItemOrder.createMany({
-                    data: this.dataArray,
-                });
+                if (this.dataArray.length > 0) {
+                    await prisma.rawItemOrder.createMany({
+                        data: this.dataArray,
+                    });
+                }
                 console.log(`${this.label} data has been processed!`)
             }
     };
