@@ -1,9 +1,9 @@
 import { isString } from "../domain/typeCheckers";
-import { CleanCategName } from "../prisma/client/client";
+import { CleanCategName, CleanCustomer } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanCategName.count();
+    const count = await prisma.cleanCustomer.count();
     return count === 0;
 };
 
@@ -29,6 +29,21 @@ const buildCleanCategNames = async () => {
     console.log("The Clean Category names table has been processed!")
 };
 
+const buildCleanCustomers = async () => {
+    const rawCustomers = await prisma.rawCustomer.findMany();
+    let cleanCustomersArr: CleanCustomer[] = [];
+
+    for (const customerData of rawCustomers) {
+        
+    };
+
+    if (cleanCustomersArr.length > 0) {
+        await prisma.cleanCustomer.createMany({
+            data: cleanCustomersArr,
+        })
+    }
+};
+
 const buildCleanLayer = async () => {
     const isClean = await checkCleanDatabase()
     if (!isClean) {
@@ -37,7 +52,8 @@ const buildCleanLayer = async () => {
     }
 
     const buildCleanFuncs = [
-        buildCleanCategNames,
+        //buildCleanCategNames,
+        buildCleanCustomers,
     ];
 
     for (const cleanFunc of buildCleanFuncs) {
