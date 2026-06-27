@@ -96,6 +96,10 @@ const buildCleanSellers = async () => {
     console.log("The Clean Sellers table has been processed!");
 };
 
+const buildCleanProducts = async () => {
+    
+};
+
 const buildCleanLayer = async () => {
     if (!await checkCleanDatabase()) {
         console.log("The clean table already has data in it!");

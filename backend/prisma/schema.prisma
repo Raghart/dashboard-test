@@ -74,8 +74,8 @@ model CleanProduct {
   product_id String @id
   product_category_name String
   category_name CleanCategName @relation(fields: [product_category_name], references: [product_category_name], onDelete: Cascade, onUpdate: Cascade)
-  product_name_length Int
-  product_description_length Int
+  product_name_lenght Int
+  product_description_lenght Int
   product_photos_qty Int
   product_weight_g Int
   product_length_cm Int
