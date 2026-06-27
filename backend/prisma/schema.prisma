@@ -114,7 +114,8 @@ model CleanOrder {
   order_delivered_customer_date DateTime
   order_estimated_delivery_date DateTime
   orderPayments CleanOrderPayment[]
-  itemOrder CleanItemOrder[]
+  itemOrders CleanItemOrder[]
+  orderReviews CleanOrderReview[]
 
   @@map("orders")
   @@schema("clean")
@@ -132,6 +133,21 @@ model RawOrderReview {
 
   @@map("orderReviews")
   @@schema("raw")
+}
+
+model CleanOrderReview {
+  id Int @id @default(autoincrement())
+  review_id String
+  order_id String
+  order CleanOrder @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: Cascade)
+  review_score Int
+  review_comment_title String?
+  review_comment_message String?
+  review_creation_date DateTime
+  review_answer_timestamp DateTime?
+
+  @@map("orderReviews")
+  @@schema("clean")
 }
 
 model RawOrderPayment {
