@@ -1,10 +1,10 @@
-import { isCleanCustomer, isCleanOrder, isCleanOrderPayment, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
-import { CleanCategName, CleanCustomer, CleanOrder, CleanOrderPayment, CleanProduct, CleanSeller } from "../prisma/client/client";
+import { isCleanCustomer, isCleanItemOrder, isCleanOrder, isCleanOrderPayment, isCleanProduct, isCleanSeller, isItemOrder, isString } from "../domain/typeCheckers";
+import { CleanCategName, CleanCustomer, CleanItemOrder, CleanOrder, CleanOrderPayment, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanOrderPayment.count();
-    const rawCount = await prisma.rawOrderPayment.count();
+    const count = await prisma.cleanItemOrder.count();
+    const rawCount = await prisma.rawItemOrder.count();
     console.log(`raw count: ${rawCount}`);
     console.log(count);
     return count === 0;
@@ -209,6 +209,47 @@ const buildCleanOrderPayments = async () => {
     console.log("The Clean Orders Payments table has been processed!");
 };
 
+const buildCleanItemOrders = async () => {
+    const rawItemOrders = await prisma.rawItemOrder.findMany();
+    const ordersID = new Set((await prisma.cleanOrder.findMany()).map(obj => obj.order_id));
+    const productsID = new Set((await prisma.cleanProduct.findMany()).map(obj => obj.product_id));
+    const sellersID = new Set((await prisma.cleanSeller.findMany()).map(obj => obj.seller_id));
+    let cleanItemOrders: CleanItemOrder[] = [];
+
+    for (const itemOrders of rawItemOrders) {
+        if (!isCleanItemOrder(itemOrders) || !ordersID.has(itemOrders.order_id)
+        || !productsID.has(itemOrders.product_id) || !sellersID.has(itemOrders.seller_id)) {
+            continue;
+        };
+
+        cleanItemOrders.push({
+            id: itemOrders.id,
+            order_id: itemOrders.order_id,
+            order_item_id: itemOrders.order_item_id,
+            product_id: itemOrders.product_id,
+            seller_id: itemOrders.seller_id,
+            shipping_limit_date: itemOrders.shipping_limit_date,
+            price: itemOrders.price,
+            freight_value: itemOrders.freight_value,
+        });
+
+        if (cleanItemOrders.length >= 1000) {
+            await prisma.cleanItemOrder.createMany({
+                data: cleanItemOrders,
+            });
+            cleanItemOrders = [];
+        }
+    }
+
+    if (cleanItemOrders.length > 0) {
+        await prisma.cleanItemOrder.createMany({
+            data: cleanItemOrders,
+        });
+    };
+
+    console.log("The Clean Item Orders table has been processed!");
+};
+
 const buildCleanLayer = async () => {
     if (!await checkCleanDatabase()) {
         console.log("The clean table already has data in it!");
@@ -221,7 +262,8 @@ const buildCleanLayer = async () => {
         //buildCleanSellers,
         //buildCleanProducts,
         //buildCleanOrders,
-        buildCleanOrderPayments,
+        //buildCleanOrderPayments,
+        buildCleanItemOrders,
     ];
 
     for (const cleanFunc of buildCleanFuncs) {
