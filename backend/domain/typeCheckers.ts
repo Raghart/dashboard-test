@@ -1,4 +1,4 @@
-import { CleanCustomer, RawCustomer } from "../prisma/client/client";
+import { CleanCustomer, CleanSeller, RawCustomer, RawSeller } from "../prisma/client/client";
 
 export const isCustomer = (data: unknown) : boolean => {
     if (!data) return false;
@@ -81,7 +81,12 @@ export const isNumber = (data: unknown) : data is number => {
 }
 
 export const isCleanCustomer = (data: RawCustomer) : data is CleanCustomer => {
-    return data.customer_id.trim() !== "" && isString(data.customer_unique_id)
+    return isString(data.customer_id) && isString(data.customer_unique_id)
         && isNumber(data.customer_zip_code_prefix) && isString(data.customer_city)
         && isString(data.customer_state);
+}
+
+export const isCleanSeller = (data: RawSeller) : data is CleanSeller => {
+    return isString(data.seller_id) && isNumber(data.seller_zip_code_prefix)
+        && isString(data.seller_state) && isString(data.seller_city);
 }
