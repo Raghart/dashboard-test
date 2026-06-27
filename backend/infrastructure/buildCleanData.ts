@@ -1,9 +1,9 @@
-import { isCleanCustomer, isCleanSeller, isString } from "../domain/typeCheckers";
-import { CleanCategName, CleanCustomer, CleanSeller } from "../prisma/client/client";
+import { isCleanCustomer, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
+import { CleanCategName, CleanCustomer, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanSeller.count();
+    const count = await prisma.cleanProduct.count();
     console.log(count);
     return count === 0;
 };
@@ -97,7 +97,41 @@ const buildCleanSellers = async () => {
 };
 
 const buildCleanProducts = async () => {
-    
+    const rawProducts = await prisma.rawProduct.findMany();
+    const categNames = (await prisma.cleanCategName.findMany()).map(obj => obj.product_category_name);
+    let cleanProducts: CleanProduct[] = [];
+
+    for (const productData of rawProducts) {
+        if (!isCleanProduct(productData) || !categNames.includes(productData.product_category_name)) {
+            continue;
+        };
+
+        cleanProducts.push({
+            product_id: productData.product_id.trim(),
+            product_category_name: productData.product_category_name.trim(),
+            product_name_lenght: productData.product_name_lenght,
+            product_description_lenght: productData.product_description_lenght,
+            product_photos_qty: productData.product_photos_qty,
+            product_weight_g: productData.product_weight_g,
+            product_length_cm: productData.product_length_cm,
+            product_height_cm: productData.product_height_cm,
+            product_width_cm: productData.product_width_cm,
+        });
+
+        if (cleanProducts.length >= 1000) {
+            await prisma.cleanProduct.createMany({
+                data: cleanProducts,
+            })
+            cleanProducts = [];
+        }
+    };
+
+    if (cleanProducts.length > 0) {
+        await prisma.cleanProduct.createMany({
+            data: cleanProducts,
+        });
+    };
+    console.log("The Clean Products table has been processed!");
 };
 
 const buildCleanLayer = async () => {
@@ -109,7 +143,8 @@ const buildCleanLayer = async () => {
     const buildCleanFuncs = [
         //buildCleanCategNames,
         //buildCleanCustomers,
-        buildCleanSellers,
+        //buildCleanSellers,
+        buildCleanProducts,
     ];
 
     for (const cleanFunc of buildCleanFuncs) {
