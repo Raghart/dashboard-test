@@ -70,6 +70,22 @@ model RawProduct {
   @@schema("raw")
 }
 
+model CleanProduct {
+  product_id String @id
+  product_category_name String
+  category_name CleanCategName @relation(fields: [product_category_name], references: [product_category_name], onDelete: Cascade, onUpdate: Cascade)
+  product_name_length Int
+  product_description_length Int
+  product_photos_qty Int
+  product_weight_g Int
+  product_length_cm Int
+  product_height_cm Int
+  product_width_cm Int
+
+  @@map("products")
+  @@schema("clean")
+}
+
 model RawOrder {
   order_id String @id
   customer_id String?
@@ -135,6 +151,7 @@ model RawCategName {
 model CleanCategName {
   product_category_name String @id
   product_category_name_english String
+  products CleanProduct[]
 
   @@map("categoryNames")
   @@schema("clean")
