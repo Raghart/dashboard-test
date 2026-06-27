@@ -1,4 +1,4 @@
-import { isCleanCustomer, isString } from "../domain/typeCheckers";
+import { isCleanCustomer, isCleanSeller, isString } from "../domain/typeCheckers";
 import { CleanCategName, CleanCustomer, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
@@ -67,8 +67,25 @@ const buildCleanCustomers = async () => {
 const buildCleanSellers = async () => {
     const rawSellers = await prisma.rawSeller.findMany();
     let cleanSellers: CleanSeller[] = [];
-    for (const sellerData of rawSellers) {
 
+    for (const sellerData of rawSellers) {
+        if (!isCleanSeller(sellerData)) {
+            continue;
+        }
+
+        cleanSellers.push({
+            seller_id: sellerData.seller_id,
+            seller_zip_code_prefix: sellerData.seller_zip_code_prefix,
+            seller_city: sellerData.seller_city,
+            seller_state: sellerData.seller_state,
+        });
+
+        if (cleanSellers.length >= 1000) {
+            await prisma.cleanSeller.createMany({
+                data: cleanSellers,
+            });
+            cleanSellers = [];
+        };
     }
 
     if (cleanSellers.length > 0) {
