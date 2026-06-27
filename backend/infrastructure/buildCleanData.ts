@@ -1,10 +1,10 @@
-import { isCleanCustomer, isCleanItemOrder, isCleanOrder, isCleanOrderPayment, isCleanProduct, isCleanSeller, isItemOrder, isString } from "../domain/typeCheckers";
-import { CleanCategName, CleanCustomer, CleanItemOrder, CleanOrder, CleanOrderPayment, CleanProduct, CleanSeller } from "../prisma/client/client";
+import { isCleanCustomer, isCleanItemOrder, isCleanOrder, isCleanOrderPayment, isCleanOrderReview, isCleanProduct, isCleanSeller, isItemOrder, isString } from "../domain/typeCheckers";
+import { CleanCategName, CleanCustomer, CleanItemOrder, CleanOrder, CleanOrderPayment, CleanOrderReview, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanItemOrder.count();
-    const rawCount = await prisma.rawItemOrder.count();
+    const count = await prisma.cleanOrderReview.count();
+    const rawCount = await prisma.rawOrderReview.count();
     console.log(`raw count: ${rawCount}`);
     console.log(count);
     return count === 0;
@@ -250,6 +250,44 @@ const buildCleanItemOrders = async () => {
     console.log("The Clean Item Orders table has been processed!");
 };
 
+const buildOrderReviews = async () => {
+    const rawOrderReviews = await prisma.rawOrderReview.findMany();
+    const ordersID = new Set((await prisma.cleanOrder.findMany()).map(obj => obj.order_id));
+    let cleanOrderReviews: CleanOrderReview[] = [];
+
+    for (const orderReview of rawOrderReviews) {
+        if (!isCleanOrderReview(orderReview) || !ordersID.has(orderReview.order_id)) {
+            continue;
+        }
+
+        cleanOrderReviews.push({
+            id: orderReview.id,
+            order_id: orderReview.order_id,
+            review_id: orderReview.review_id,
+            review_score: orderReview.review_score,
+            review_comment_title: orderReview.review_comment_title,
+            review_comment_message: orderReview.review_comment_message,
+            review_creation_date: orderReview.review_creation_date,
+            review_answer_timestamp: orderReview.review_answer_timestamp,
+        });
+
+        if (cleanOrderReviews.length >= 1000) {
+            await prisma.cleanOrderReview.createMany({
+                data: cleanOrderReviews,
+            })
+            cleanOrderReviews = [];
+        }
+    }
+
+    if (cleanOrderReviews.length > 0) {
+        await prisma.cleanOrderReview.createMany({
+            data: cleanOrderReviews,
+        });
+    }
+
+    console.log("The Clean Orders Reviews table has been processed!");
+};
+
 const buildCleanLayer = async () => {
     if (!await checkCleanDatabase()) {
         console.log("The clean table already has data in it!");
@@ -263,7 +301,8 @@ const buildCleanLayer = async () => {
         //buildCleanProducts,
         //buildCleanOrders,
         //buildCleanOrderPayments,
-        buildCleanItemOrders,
+        //buildCleanItemOrders,
+        buildOrderReviews,
     ];
 
     for (const cleanFunc of buildCleanFuncs) {
