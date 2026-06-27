@@ -1,9 +1,10 @@
-import { isString } from "../domain/typeCheckers";
+import { isCleanCustomer, isString } from "../domain/typeCheckers";
 import { CleanCategName, CleanCustomer } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
     const count = await prisma.cleanCustomer.count();
+    console.log(count);
     return count === 0;
 };
 
@@ -26,7 +27,7 @@ const buildCleanCategNames = async () => {
         data: cleanCategNames,
         skipDuplicates: true,
     })
-    console.log("The Clean Category names table has been processed!")
+    console.log("The Clean Category names table has been processed!");
 };
 
 const buildCleanCustomers = async () => {
@@ -34,20 +35,38 @@ const buildCleanCustomers = async () => {
     let cleanCustomersArr: CleanCustomer[] = [];
 
     for (const customerData of rawCustomers) {
-        
+        if (!isCleanCustomer(customerData)) {
+            continue;
+        }
+
+        cleanCustomersArr.push({
+            customer_id: customerData.customer_id.trim(),
+            customer_unique_id: customerData.customer_unique_id.trim(),
+            customer_zip_code_prefix: customerData.customer_zip_code_prefix,
+            customer_city: customerData.customer_city.trim(),
+            customer_state: customerData.customer_state.trim(),
+        })
+
+        if (cleanCustomersArr.length >= 1000) {
+            await prisma.cleanCustomer.createMany({
+                data: cleanCustomersArr,
+            });
+
+            cleanCustomersArr = [];  
+        };
     };
 
     if (cleanCustomersArr.length > 0) {
         await prisma.cleanCustomer.createMany({
             data: cleanCustomersArr,
-        })
-    }
+        });
+    };
+    console.log("The Clean Customers table has been processed!");
 };
 
 const buildCleanLayer = async () => {
-    const isClean = await checkCleanDatabase()
-    if (!isClean) {
-        console.log("clean table already has data in it!");
+    if (!await checkCleanDatabase()) {
+        console.log("The clean table already has data in it!");
         return;
     }
 
