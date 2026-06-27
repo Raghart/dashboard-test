@@ -17,13 +17,14 @@ const buildCleanCategNames = async () => {
         }
         
         cleanCategNames.push({
-            product_category_name: struct.product_category_name,
-            product_category_name_english: struct.product_category_name_english,
+            product_category_name: struct.product_category_name.trim(),
+            product_category_name_english: struct.product_category_name_english.trim(),
         });
     };
 
     await prisma.cleanCategName.createMany({
-        data: cleanCategNames
+        data: cleanCategNames,
+        skipDuplicates: true,
     })
     console.log("The Clean Category names table has been processed!")
 };
