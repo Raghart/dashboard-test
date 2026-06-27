@@ -227,8 +227,12 @@ model GoldFactSales {
   id Int @id @default(autoincrement())
   customer_id String
   customer GoldDimCustomer @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade, onUpdate: Cascade)
-  item_price Decimal
-  freight_value Decimal
+  
+  product_id String
+  product GoldDimProduct @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: Cascade)
+  
+  item_price Float
+  freight_value Float
   payment_value_allocated Float 
   is_delivered Boolean
   is_canceled Boolean 
@@ -245,5 +249,14 @@ model GoldDimCustomer {
 
   fact_sales GoldFactSales[]
   @@map("dim_customer")
+  @@schema("gold")
+}
+
+model GoldDimProduct {
+  product_id String @id
+  category String
+
+  fact_sales GoldFactSales[]
+  @@map("dim_product")
   @@schema("gold")
 }
