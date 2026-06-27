@@ -116,6 +116,6 @@ export const isCleanOrderPayment = (data: RawOrderPayment) : data is CleanOrderP
 export const isCleanItemOrder = (data: RawItemOrder) : data is CleanItemOrder => {
     return isString(data.order_id) && isString(data.product_id)
     && isString(data.seller_id) && isNumber(data.order_item_id)
-    && isNumber(data.price) && isString(data.freight_value)
+    && isNumber(data.price) && isNumber(data.freight_value)
     && isDate(data.shipping_limit_date);
 };
