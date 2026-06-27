@@ -1,9 +1,11 @@
-import { isCleanCustomer, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
-import { CleanCategName, CleanCustomer, CleanProduct, CleanSeller } from "../prisma/client/client";
+import { isCleanCustomer, isCleanOrder, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
+import { CleanCategName, CleanCustomer, CleanOrder, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanProduct.count();
+    const count = await prisma.cleanOrder.count();
+    const rawCount = await prisma.rawOrder.count();
+    console.log(`raw count: ${rawCount}`);
     console.log(count);
     return count === 0;
 };
@@ -134,6 +136,44 @@ const buildCleanProducts = async () => {
     console.log("The Clean Products table has been processed!");
 };
 
+const buildCleanOrders = async () => {
+    const rawOrders = await prisma.rawOrder.findMany();
+    const customerIDS = (await prisma.cleanCustomer.findMany()).map(obj => obj.customer_id);
+    let cleanOrders: CleanOrder[] = [];
+
+    for (const orderData of rawOrders) {
+        console.log(orderData.order_approved_at)
+        if (!isCleanOrder(orderData) || !customerIDS.includes(orderData.customer_id)) {
+            continue;
+        };
+
+        cleanOrders.push({
+            order_id: orderData.order_id,
+            customer_id: orderData.customer_id,
+            order_status: orderData.order_status,
+            order_purchase_timestamp: orderData.order_purchase_timestamp,
+            order_approved_at: orderData.order_approved_at,
+            order_delivered_carrier_date: orderData.order_delivered_carrier_date,
+            order_delivered_customer_date: orderData.order_delivered_customer_date,
+            order_estimated_delivery_date: orderData.order_estimated_delivery_date,
+        });
+
+        if (cleanOrders.length >= 1000) {
+            await prisma.cleanOrder.createMany({
+                data: cleanOrders,
+            });
+            cleanOrders = [];
+        }
+    };
+
+    if (cleanOrders.length > 0) {
+        await prisma.cleanOrder.createMany({
+            data: cleanOrders,
+        });
+    };
+    console.log("The Clean Orders table has been processed!");
+};
+
 const buildCleanLayer = async () => {
     if (!await checkCleanDatabase()) {
         console.log("The clean table already has data in it!");
@@ -144,7 +184,8 @@ const buildCleanLayer = async () => {
         //buildCleanCategNames,
         //buildCleanCustomers,
         //buildCleanSellers,
-        buildCleanProducts,
+        //buildCleanProducts,
+        buildCleanOrders,
     ];
 
     for (const cleanFunc of buildCleanFuncs) {
