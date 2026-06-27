@@ -3,10 +3,7 @@ import { CleanCategName, CleanCustomer, CleanItemOrder, CleanOrder, CleanOrderPa
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanOrderReview.count();
-    const rawCount = await prisma.rawOrderReview.count();
-    console.log(`raw count: ${rawCount}`);
-    console.log(count);
+    const count = await prisma.cleanCustomer.count();
     return count === 0;
 };
 
@@ -295,13 +292,13 @@ const buildCleanLayer = async () => {
     }
 
     const buildCleanFuncs = [
-        //buildCleanCategNames,
-        //buildCleanCustomers,
-        //buildCleanSellers,
-        //buildCleanProducts,
-        //buildCleanOrders,
-        //buildCleanOrderPayments,
-        //buildCleanItemOrders,
+        buildCleanCategNames,
+        buildCleanCustomers,
+        buildCleanSellers,
+        buildCleanProducts,
+        buildCleanOrders,
+        buildCleanOrderPayments,
+        buildCleanItemOrders,
         buildOrderReviews,
     ];
 
