@@ -1,3 +1,4 @@
+import { isDate } from "node:util/types";
 import { isCleanCustomer, isCleanOrder, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
 import { CleanCategName, CleanCustomer, CleanOrder, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
@@ -142,7 +143,6 @@ const buildCleanOrders = async () => {
     let cleanOrders: CleanOrder[] = [];
 
     for (const orderData of rawOrders) {
-        console.log(orderData.order_approved_at)
         if (!isCleanOrder(orderData) || !customerIDS.includes(orderData.customer_id)) {
             continue;
         };

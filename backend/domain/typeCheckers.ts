@@ -103,6 +103,6 @@ export const isCleanProduct = (data: RawProduct) : data is CleanProduct => {
 export const isCleanOrder = (data: RawOrder) : data is CleanOrder => {
     return isString(data.order_id) && isString(data.customer_id)
     && isString(data.order_status) && isDate(data.order_purchase_timestamp)
-    && isString(data.order_approved_at) && isDate(data.order_delivered_carrier_date)
-    && isString(data.order_delivered_customer_date) && isDate(data.order_estimated_delivery_date);
+    && isDate(data.order_approved_at) && isDate(data.order_delivered_carrier_date)
+    && isDate(data.order_delivered_customer_date) && isDate(data.order_estimated_delivery_date);
 };
