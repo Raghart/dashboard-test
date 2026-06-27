@@ -231,6 +231,9 @@ model GoldFactSales {
   product_id String
   product GoldDimProduct @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: Cascade)
   
+  order_id String
+  order GoldDimOrder @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: Cascade)
+
   item_price Float
   freight_value Float
   payment_value_allocated Float 
@@ -258,5 +261,19 @@ model GoldDimProduct {
 
   fact_sales GoldFactSales[]
   @@map("dim_product")
+  @@schema("gold")
+}
+
+model GoldDimOrder {
+  order_id String @id
+  order_status String
+  order_purchase_timestamp DateTime
+  order_approved_at DateTime
+  order_delivered_carrier_date DateTime
+  order_delivered_customer_date DateTime
+  order_estimated_delivery_date DateTime
+
+  fact_sales GoldFactSales[]
+  @@map("dim_order")
   @@schema("gold")
 }
