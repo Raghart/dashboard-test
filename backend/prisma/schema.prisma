@@ -111,6 +111,7 @@ model CleanOrder {
   order_delivered_carrier_date DateTime
   order_delivered_customer_date DateTime
   order_estimated_delivery_date DateTime
+  orderPayments CleanOrderPayment[]
 
   @@map("orders")
   @@schema("clean")
@@ -140,6 +141,19 @@ model RawOrderPayment {
 
   @@map("orderPayments")
   @@schema("raw")
+}
+
+model CleanOrderPayment {
+  id Int @id @default(autoincrement())
+  order_id String
+  order CleanOrder @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: Cascade)
+  payment_sequential Int
+  payment_type String
+  payment_installments Int
+  payment_value Float
+
+  @@map("orderPayments")
+  @@schema("clean")
 }
 
 model RawItemOrder {
