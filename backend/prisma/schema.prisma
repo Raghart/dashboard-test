@@ -45,6 +45,16 @@ model RawSeller {
     @@schema("raw")
 }
 
+model CleanSeller {
+    seller_id String @id
+    seller_zip_code_prefix Int
+    seller_city String
+    seller_state String
+
+    @@map("sellers")
+    @@schema("clean")
+}
+
 model RawProduct {
   product_id String @id
   product_category_name String?
