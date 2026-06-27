@@ -1,5 +1,5 @@
 import { isDate } from "node:util/types";
-import { CleanCustomer, CleanOrder, CleanProduct, CleanSeller, RawCustomer, RawOrder, RawProduct, RawSeller } from "../prisma/client/client";
+import { CleanCustomer, CleanOrder, CleanOrderPayment, CleanProduct, CleanSeller, RawCustomer, RawOrder, RawOrderPayment, RawProduct, RawSeller } from "../prisma/client/client";
 
 export const isCustomer = (data: unknown) : boolean => {
     if (!data) return false;
@@ -105,4 +105,10 @@ export const isCleanOrder = (data: RawOrder) : data is CleanOrder => {
     && isString(data.order_status) && isDate(data.order_purchase_timestamp)
     && isDate(data.order_approved_at) && isDate(data.order_delivered_carrier_date)
     && isDate(data.order_delivered_customer_date) && isDate(data.order_estimated_delivery_date);
+};
+
+export const isCleanOrderPayment = (data: RawOrderPayment) : data is CleanOrderPayment => {
+    return isString(data.order_id) && isString(data.payment_type)
+    && isNumber(data.payment_sequential) && isNumber(data.payment_installments)
+    && isNumber(data.payment_value);
 };
