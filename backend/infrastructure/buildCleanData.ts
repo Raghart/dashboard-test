@@ -1,11 +1,10 @@
-import { isDate } from "node:util/types";
-import { isCleanCustomer, isCleanOrder, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
-import { CleanCategName, CleanCustomer, CleanOrder, CleanProduct, CleanSeller } from "../prisma/client/client";
+import { isCleanCustomer, isCleanOrder, isCleanOrderPayment, isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
+import { CleanCategName, CleanCustomer, CleanOrder, CleanOrderPayment, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {
-    const count = await prisma.cleanOrder.count();
-    const rawCount = await prisma.rawOrder.count();
+    const count = await prisma.cleanOrderPayment.count();
+    const rawCount = await prisma.rawOrderPayment.count();
     console.log(`raw count: ${rawCount}`);
     console.log(count);
     return count === 0;
@@ -174,6 +173,42 @@ const buildCleanOrders = async () => {
     console.log("The Clean Orders table has been processed!");
 };
 
+const buildCleanOrderPayments = async () => {
+    const rawOrderPayments = await prisma.rawOrderPayment.findMany();
+    const ordersID = (await prisma.cleanOrder.findMany()).map(obj => obj.order_id);
+    let cleanOrderPayments: CleanOrderPayment[] = [];
+
+    for (const orderPayment of rawOrderPayments) {
+        if (!isCleanOrderPayment(orderPayment) || !ordersID.includes(orderPayment.order_id)) {
+            continue;
+        };
+
+        cleanOrderPayments.push({
+            id: orderPayment.id,
+            order_id: orderPayment.order_id,
+            payment_type: orderPayment.payment_type,
+            payment_sequential: orderPayment.payment_sequential,
+            payment_installments: orderPayment.payment_installments,
+            payment_value: orderPayment.payment_value,
+        });
+
+        if (cleanOrderPayments.length >= 1000) {
+            await prisma.cleanOrderPayment.createMany({
+                data: cleanOrderPayments,
+            });
+            cleanOrderPayments = [];
+        }
+    };
+
+    if (cleanOrderPayments.length > 0) {
+        await prisma.cleanOrderPayment.createMany({
+            data: cleanOrderPayments,
+        });
+    };
+
+    console.log("The Clean Orders Payments table has been processed!");
+};
+
 const buildCleanLayer = async () => {
     if (!await checkCleanDatabase()) {
         console.log("The clean table already has data in it!");
@@ -185,7 +220,8 @@ const buildCleanLayer = async () => {
         //buildCleanCustomers,
         //buildCleanSellers,
         //buildCleanProducts,
-        buildCleanOrders,
+        //buildCleanOrders,
+        buildCleanOrderPayments,
     ];
 
     for (const cleanFunc of buildCleanFuncs) {
