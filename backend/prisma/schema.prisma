@@ -51,6 +51,7 @@ model CleanSeller {
     seller_zip_code_prefix Int
     seller_city String
     seller_state String
+    itemOrders CleanItemOrder[]
 
     @@map("sellers")
     @@schema("clean")
@@ -82,6 +83,7 @@ model CleanProduct {
   product_length_cm Int
   product_height_cm Int
   product_width_cm Int
+  itemProducts CleanItemOrder[]
 
   @@map("products")
   @@schema("clean")
@@ -112,6 +114,7 @@ model CleanOrder {
   order_delivered_customer_date DateTime
   order_estimated_delivery_date DateTime
   orderPayments CleanOrderPayment[]
+  itemOrder CleanItemOrder[]
 
   @@map("orders")
   @@schema("clean")
@@ -168,6 +171,23 @@ model RawItemOrder {
   
   @@map("itemOrders")
   @@schema("raw")
+}
+
+model CleanItemOrder {
+  id Int @id @default(autoincrement())
+  order_item_id Int
+  order_id String
+  order CleanOrder @relation(fields: [order_id], references: [order_id], onDelete: Cascade, onUpdate: Cascade)
+  product_id String
+  product CleanProduct @relation(fields: [product_id], references: [product_id], onDelete: Cascade, onUpdate: Cascade)
+  seller_id String
+  seller CleanSeller @relation(fields: [seller_id], references: [seller_id], onDelete: Cascade, onUpdate: Cascade)
+  shipping_limit_date DateTime
+  price Float
+  freight_value Float
+  
+  @@map("itemOrders")
+  @@schema("clean")
 }
 
 model RawCategName {
