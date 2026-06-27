@@ -30,6 +30,7 @@ model CleanCustomer {
   customer_zip_code_prefix Int
   customer_city   String
   customer_state  String
+  orders CleanOrder[]
 
   @@map("customers")
   @@schema("clean")
@@ -98,6 +99,21 @@ model RawOrder {
 
   @@map("orders")
   @@schema("raw")
+}
+
+model CleanOrder {
+  order_id String @id
+  customer_id String 
+  customer CleanCustomer @relation(fields: [customer_id], references: [customer_id], onDelete: Cascade, onUpdate: Cascade)
+  order_status String
+  order_purchase_timestamp DateTime
+  order_approved_at DateTime
+  order_delivered_carrier_date DateTime
+  order_delivered_customer_date DateTime
+  order_estimated_delivery_date DateTime
+
+  @@map("orders")
+  @@schema("clean")
 }
 
 model RawOrderReview {
