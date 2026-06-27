@@ -222,3 +222,16 @@ model CleanCategName {
   @@map("categoryNames")
   @@schema("clean")
 }
+
+model GoldFactSales {
+  id Int @id @default(autoincrement())
+  item_price Decimal
+  freight_value Decimal
+  payment_value_allocated Float 
+  is_delivered Boolean
+  is_canceled Boolean 
+  is_on_time Boolean
+
+  @@map("factSales")
+  @@schema("gold")
+}
