@@ -3,6 +3,7 @@ import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
     const dimCount = await prisma.goldDimCustomer.count();
+    console.log(dimCount)
     return dimCount === 0;
 };
 

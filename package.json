@@ -7,7 +7,7 @@
     "backend"
   ],
   "scripts": {
-    "dev": "tsx --watch backend/infrastructure/buildCleanData.ts",
+    "dev": "tsx --watch backend/infrastructure/buildGoldData.ts",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
