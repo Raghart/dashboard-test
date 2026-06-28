@@ -1,8 +1,8 @@
-import { GoldDimCustomer } from "../prisma/client/client";
+import { GoldDimCustomer, GoldDimProduct } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
-    const dimCount = await prisma.goldDimCustomer.count();
+    const dimCount = await prisma.goldDimProduct.count();
     console.log(dimCount)
     return dimCount === 0;
 };
@@ -32,7 +32,34 @@ const buildGoldCustomers = async () => {
         });
     };
 
-    console.log("The Gold Dimension for Customers has been sucessfully processed!")
+    console.log("The Gold Dimension for Customers has been sucessfully processed!");
+};
+
+const buildGoldProducts = async () => {
+    const cleanProducts = await prisma.cleanProduct.findMany();
+    let goldProducts: GoldDimProduct[] = [];
+
+    for (const product of cleanProducts) {
+        goldProducts.push({
+            product_id: product.product_id,
+            category: product.product_category_name,
+        });
+
+        if (goldProducts.length >= 1000) {
+            await prisma.goldDimProduct.createMany({
+                data: goldProducts,
+            })
+            goldProducts = [];
+        }
+    };
+
+    if (goldProducts.length > 0) {
+        await prisma.goldDimProduct.createMany({
+            data: goldProducts,
+        });
+    };
+
+    console.log("The Gold Dimension for Products has been sucessfully processed!");
 };
 
 const buildGoldLayer = async () => {
@@ -42,7 +69,8 @@ const buildGoldLayer = async () => {
     }
 
     const buildGoldFuncs = [
-        buildGoldCustomers,
+        //buildGoldCustomers,
+        buildGoldProducts,
     ];
 
     for (const buildFunc of buildGoldFuncs) {
