@@ -114,7 +114,21 @@ const buildGoldDates = async () => {
         })
         
         startingDate.setDate(startingDate.getDate() + 1);
+
+        if (goldDates.length >= 1000) {
+            await prisma.goldDimDate.createMany({
+                data: goldDates,
+            });
+
+            goldDates = [];
+        }
     }
+    
+    if (goldDates.length > 0) {
+        await prisma.goldDimDate.createMany({
+            data: goldDates,
+        });
+    };
     console.log("The Gold Dimension for Dates has been sucessfully processed!");
 }
 
