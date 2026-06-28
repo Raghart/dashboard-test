@@ -2,7 +2,7 @@ import { GoldDimCustomer, GoldDimOrder, GoldDimProduct } from "../prisma/client/
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
-    const dimCount = await prisma.goldDimProduct.count();
+    const dimCount = await prisma.goldDimOrder.count();
     console.log(dimCount)
     return dimCount === 0;
 };
@@ -75,7 +75,14 @@ const buildGoldOrders = async () => {
             order_delivered_carrier_date: order.order_delivered_carrier_date,
             order_delivered_customer_date: order.order_delivered_customer_date,
             order_estimated_delivery_date: order.order_estimated_delivery_date,
-        })
+        });
+
+        if (goldOrders.length >= 1000) {
+            await prisma.goldDimOrder.createMany({
+                data: goldOrders,
+            })
+            goldOrders = [];
+        };
     };
 
     if (goldOrders.length > 0) {
