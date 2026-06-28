@@ -287,7 +287,6 @@ model GoldDimDate {
   year Int
   month Int
   weekday String
-  is_festive Boolean
 
   fact_sales GoldFactSales[]
   @@map("dim_date")

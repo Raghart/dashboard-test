@@ -1,8 +1,8 @@
-import { GoldDimCustomer, GoldDimOrder, GoldDimProduct } from "../prisma/client/client";
+import { GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
-    const dimCount = await prisma.goldDimOrder.count();
+    const dimCount = await prisma.goldDimDate.count();
     console.log(dimCount)
     return dimCount === 0;
 };
@@ -94,6 +94,30 @@ const buildGoldOrders = async () => {
     console.log("The Gold Dimension for Orders has been sucessfully processed!");
 };
 
+const buildGoldDates = async () => {
+    let goldDates: GoldDimDate[] = [];
+    const startingDate = new Date("2015-01-01");
+    const endingDate = new Date("2025-12-31");
+    while (startingDate <= endingDate) {
+        const day = startingDate.getDate().toString().padStart(2, "0");
+        const month = startingDate.getMonth() + 1;
+        const year = startingDate.getFullYear();
+
+        const dateID = parseInt(`${year}${month}${day}`);
+        
+        goldDates.push({
+            date_id: dateID,
+            date: `${year}-${month}-${day}`,
+            year: year,
+            month: month,
+            weekday: startingDate.toLocaleDateString("es-ES", { weekday: "long" }),
+        })
+        
+        startingDate.setDate(startingDate.getDate() + 1);
+    }
+    console.log("The Gold Dimension for Dates has been sucessfully processed!");
+}
+
 const buildGoldLayer = async () => {
     if (!await checkGoldDatabase()) {
         console.log("Gold layer already has data in it!")
@@ -103,7 +127,8 @@ const buildGoldLayer = async () => {
     const buildGoldFuncs = [
         //buildGoldCustomers,
         //buildGoldProducts,
-        buildGoldOrders,
+        //buildGoldOrders,
+        buildGoldDates,
     ];
 
     for (const buildFunc of buildGoldFuncs) {
