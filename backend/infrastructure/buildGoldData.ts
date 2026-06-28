@@ -1,4 +1,4 @@
-import { GoldDimCustomer, GoldDimProduct } from "../prisma/client/client";
+import { GoldDimCustomer, GoldDimOrder, GoldDimProduct } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
@@ -62,6 +62,31 @@ const buildGoldProducts = async () => {
     console.log("The Gold Dimension for Products has been sucessfully processed!");
 };
 
+const buildGoldOrders = async () => {
+    const cleanOrders = await prisma.cleanOrder.findMany();
+    let goldOrders: GoldDimOrder[] = [];
+
+    for (const order of cleanOrders) {
+        goldOrders.push({
+            order_id: order.order_id,
+            order_status: order.order_status,
+            order_purchase_timestamp: order.order_purchase_timestamp,
+            order_approved_at: order.order_approved_at,
+            order_delivered_carrier_date: order.order_delivered_carrier_date,
+            order_delivered_customer_date: order.order_delivered_customer_date,
+            order_estimated_delivery_date: order.order_estimated_delivery_date,
+        })
+    };
+
+    if (goldOrders.length > 0) {
+        await prisma.goldDimOrder.createMany({
+            data: goldOrders,
+        });
+    };
+
+    console.log("The Gold Dimension for Orders has been sucessfully processed!");
+};
+
 const buildGoldLayer = async () => {
     if (!await checkGoldDatabase()) {
         console.log("Gold layer already has data in it!")
@@ -70,7 +95,8 @@ const buildGoldLayer = async () => {
 
     const buildGoldFuncs = [
         //buildGoldCustomers,
-        buildGoldProducts,
+        //buildGoldProducts,
+        buildGoldOrders,
     ];
 
     for (const buildFunc of buildGoldFuncs) {

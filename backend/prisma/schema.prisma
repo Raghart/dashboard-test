@@ -275,7 +275,6 @@ model GoldDimOrder {
   order_delivered_carrier_date DateTime
   order_delivered_customer_date DateTime
   order_estimated_delivery_date DateTime
-  shipping_limit_date DateTime
 
   fact_sales GoldFactSales[]
   @@map("dim_order")
