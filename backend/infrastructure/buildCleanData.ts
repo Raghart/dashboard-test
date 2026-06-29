@@ -1,5 +1,7 @@
-import { isCleanCustomer, isCleanItemOrder, isCleanOrder, isCleanOrderPayment, isCleanOrderReview, isCleanProduct, isCleanSeller, isItemOrder, isString } from "../domain/typeCheckers";
-import { CleanCategName, CleanCustomer, CleanItemOrder, CleanOrder, CleanOrderPayment, CleanOrderReview, CleanProduct, CleanSeller } from "../prisma/client/client";
+import { isCleanCustomer, isCleanItemOrder, isCleanOrder, isCleanOrderPayment, isCleanOrderReview, 
+    isCleanProduct, isCleanSeller, isString } from "../domain/typeCheckers";
+import { CleanCategName, CleanCustomer, CleanItemOrder, CleanOrder, CleanOrderPayment, 
+    CleanOrderReview, CleanProduct, CleanSeller } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkCleanDatabase = async () : Promise<boolean> => {

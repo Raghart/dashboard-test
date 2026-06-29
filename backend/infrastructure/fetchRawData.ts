@@ -1,6 +1,5 @@
 import axios from "axios";
-import { CsvData, RawCategName, RawCustomer, RawItemOrder, RawOrder, RawOrderPayment, RawOrderReview, 
-    RawProduct, RawSeller } from "../domain/csvTypes";
+import { CsvData } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, 
     SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
