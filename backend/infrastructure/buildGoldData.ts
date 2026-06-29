@@ -1,11 +1,10 @@
 import { FactSalesData } from "../domain/csvTypes";
-import { isCleanOrder, isCleanOrderPayment, isOrder } from "../domain/typeCheckers";
-import { CleanOrder, CleanOrderPayment, GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct, GoldFactSales } from "../prisma/client/client";
+import { isCleanOrder } from "../domain/typeCheckers";
+import { GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
     const dimCount = await prisma.goldFactSales.count();
-    console.log(dimCount)
     return dimCount === 0;
 };
 
@@ -221,10 +220,10 @@ const buildGoldLayer = async () => {
     }
 
     const buildGoldFuncs = [
-        //buildGoldCustomers,
-        //buildGoldProducts,
-        //buildGoldOrders,
-        //buildGoldDates,
+        buildGoldCustomers,
+        buildGoldProducts,
+        buildGoldOrders,
+        buildGoldDates,
         buildGoldFactSales,
     ];
 
