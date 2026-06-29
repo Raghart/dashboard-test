@@ -1,5 +1,5 @@
 import { isCleanOrder, isCleanOrderPayment, isOrder } from "../domain/typeCheckers";
-import { CleanOrder, GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct, GoldFactSales } from "../prisma/client/client";
+import { CleanOrder, CleanOrderPayment, GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct, GoldFactSales } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
@@ -144,7 +144,12 @@ const buildGoldFactSales = async () => {
     const ordersData = await prisma.cleanOrder.findMany();
     const orderMap = new Map(ordersData.map(obj => [obj.order_id, obj]))
     const orderPayments = await prisma.cleanOrderPayment.findMany();
-    const orderPaymentsMap = new Map(orderPayments.map(obj => [obj.order_id, obj]))
+    const totalPaymentMap = new Map<string, number>();
+
+    for (const orderPayment of orderPayments) {
+        const currentTotal = totalPaymentMap.get(orderPayment.order_id) || 0;
+        totalPaymentMap.set(orderPayment.order_id, currentTotal + orderPayment.payment_value);
+    }
     
     const itemOrders = await prisma.cleanItemOrder.findMany();
     let goldFactSales: GoldFactSales[] = [];
@@ -154,11 +159,6 @@ const buildGoldFactSales = async () => {
         if (!isCleanOrder(order)) {
             throw new Error(`order wasn't found: ${order}`)
         }
-
-        const orderPaymentData = orderPaymentsMap.get(itemOrder.order_id);
-        if (!isCleanOrderPayment(orderPaymentData)) {
-            throw new Error(`order payment wasn't found: ${orderPaymentData}`)
-        };
 
         goldFactSales.push({
             id: 0,
