@@ -1,8 +1,9 @@
-import { GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct } from "../prisma/client/client";
+import { isCleanOrder, isCleanOrderPayment, isOrder } from "../domain/typeCheckers";
+import { CleanOrder, GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct, GoldFactSales } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
 
 const checkGoldDatabase = async () : Promise<boolean> => {
-    const dimCount = await prisma.goldDimDate.count();
+    const dimCount = await prisma.goldFactSales.count();
     console.log(dimCount)
     return dimCount === 0;
 };
@@ -132,6 +133,48 @@ const buildGoldDates = async () => {
     console.log("The Gold Dimension for Dates has been sucessfully processed!");
 }
 
+const buildGoldFactSales = async () => {
+    const ordersData = await prisma.cleanOrder.findMany();
+    const orderMap = new Map(ordersData.map(obj => [obj.order_id, obj]))
+    const itemOrders = await prisma.cleanItemOrder.findMany();
+    const orderPayments = await prisma.cleanOrderPayment.findMany();
+    const orderPaymentsMap = new Map(orderPayments.map(obj => [obj.order_id, obj]))
+    let goldFactSales: GoldFactSales[] = [];
+
+    for (const itemOrder of itemOrders) {
+        const order = orderMap.get(itemOrder.order_id)
+        if (!isCleanOrder(order)) {
+            throw new Error(`order wasn't found: ${order}`)
+        }
+
+        const orderPaymentData = orderPaymentsMap.get(itemOrder.order_id);
+        if (!isCleanOrderPayment(orderPaymentData)) {
+            throw new Error(`order payment wasn't found: ${orderPaymentData}`)
+        };
+
+        goldFactSales.push({
+            id: 0,
+            date_id: 0,
+            order_id: itemOrder.order_id,
+            customer_id: order.customer_id,
+            product_id: itemOrder.product_id,
+            freight_value: itemOrder.freight_value,
+            item_price: itemOrder.price,
+            payment_value_allocated: 0,
+            is_delivered: order.order_status === "delivered",
+            is_canceled: order.order_status === "canceled",
+            is_on_time: order.order_status === "delivered" && 
+                order.order_delivered_customer_date <= order.order_estimated_delivery_date,
+        });
+    };
+    if (goldFactSales.length > 0) {
+        await prisma.goldFactSales.createMany({
+            data: goldFactSales,
+        });
+    };
+    console.log("The Gold Dimension for Dates has been sucessfully processed!");
+};
+
 const buildGoldLayer = async () => {
     if (!await checkGoldDatabase()) {
         console.log("Gold layer already has data in it!")
@@ -142,7 +185,8 @@ const buildGoldLayer = async () => {
         //buildGoldCustomers,
         //buildGoldProducts,
         //buildGoldOrders,
-        buildGoldDates,
+        //buildGoldDates,
+        buildGoldFactSales,
     ];
 
     for (const buildFunc of buildGoldFuncs) {

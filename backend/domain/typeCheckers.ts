@@ -100,14 +100,14 @@ export const isCleanProduct = (data: RawProduct) : data is CleanProduct => {
     && isNumber(data.product_width_cm);
 };
 
-export const isCleanOrder = (data: RawOrder) : data is CleanOrder => {
+export const isCleanOrder = (data: any) : data is CleanOrder => {
     return isString(data.order_id) && isString(data.customer_id)
     && isString(data.order_status) && isDate(data.order_purchase_timestamp)
     && isDate(data.order_approved_at) && isDate(data.order_delivered_carrier_date)
     && isDate(data.order_delivered_customer_date) && isDate(data.order_estimated_delivery_date);
 };
 
-export const isCleanOrderPayment = (data: RawOrderPayment) : data is CleanOrderPayment => {
+export const isCleanOrderPayment = (data: any) : data is CleanOrderPayment => {
     return isString(data.order_id) && isString(data.payment_type)
     && isNumber(data.payment_sequential) && isNumber(data.payment_installments)
     && isNumber(data.payment_value);
