@@ -16,6 +16,16 @@ export interface RawItemData {
     freight_value: number | null;
 }
 
+export interface RawOrderReviewData {
+    order_id: string | null;
+    review_id: string | null;
+    review_score: number | null;
+    review_comment_title: string | null;
+    review_comment_message: string | null;
+    review_creation_date: Date | null;
+    review_answer_timestamp: Date | null;
+}
+
 export interface FactSalesData {
     order_id: string;
     product_id: string;

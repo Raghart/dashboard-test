@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CsvData, RawItemData } from "../domain/csvTypes";
+import { CsvData, RawItemData, RawOrderReviewData } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, 
     SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
@@ -145,7 +145,7 @@ const buildCsvLayout = () => {
         },
     };
 
-    const orderReviewsStruct: CsvData<RawOrderReview> = {
+    const orderReviewsStruct: CsvData<RawOrderReviewData> = {
         url: ORDREVIEWSURL,
         label: "Order reviews",
         dataArray: [],
@@ -155,7 +155,6 @@ const buildCsvLayout = () => {
             }
 
             this.dataArray.push({
-                id: 0,
                 review_id: row.data?.review_id ?? null,
                 order_id: row.data?.order_id ?? null,
                 review_score: row.data?.review_score ?? null,
