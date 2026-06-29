@@ -1,10 +1,11 @@
 import axios from "axios";
-import { CsvData } from "../domain/csvTypes";
+import { CsvData, RawItemData } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, 
     SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
 import { parseRawDate, parseRawObject } from "../domain/parseTypes";
+import { RawCustomer } from "../prisma/client/client";
 
 const fetchCSVPaparse = async (dataStruct: CsvData<any>) => {
     const res = await axios.get(dataStruct.url);
@@ -62,7 +63,7 @@ const buildCsvLayout = () => {
             },
     }
 
-    const itemOrderStruct: CsvData<RawItemOrder> = {
+    const itemOrderStruct: CsvData<RawItemData> = {
         url: ITMORDERURL,
             label: "Item orders",
             dataArray: [],

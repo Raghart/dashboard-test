@@ -6,6 +6,16 @@ export interface CsvData<T> {
     completeFunc: () => void
 }
 
+export interface RawItemData {
+    order_item_id: number | null;
+    order_id: string | null;
+    product_id: string | null;
+    seller_id: string | null;
+    shipping_limit_date: Date | null;
+    price: number | null;
+    freight_value: number | null;
+}
+
 export interface FactSalesData {
     order_id: string;
     product_id: string;
