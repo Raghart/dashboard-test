@@ -152,18 +152,26 @@ const buildTotalPaymentMap = async () : Promise<Map<string,number>> => {
     return totalPaymentMap;
 };
 
-const buildGoldFactSales = async () => {
-    const ordersData = await prisma.cleanOrder.findMany();
-    const orderMap = new Map(ordersData.map(obj => [obj.order_id, obj]))
-    const totalPaymentMap = await buildTotalPaymentMap();
+const buildTotalValuesMap = async () : Promise<Map<string,number>> => {
     const itemOrders = await prisma.cleanItemOrder.findMany();
 
     const itemsTotalValuesMap = new Map<string,number>();
+
     for (const itemOrder of itemOrders) {
         const currentTotal = itemsTotalValuesMap.get(itemOrder.order_id) || 0;
         itemsTotalValuesMap.set(itemOrder.order_id, currentTotal + 
             (itemOrder.price + itemOrder.freight_value));
     };
+
+    return itemsTotalValuesMap;
+}
+
+const buildGoldFactSales = async () => {
+    const ordersData = await prisma.cleanOrder.findMany();
+    const orderMap = new Map(ordersData.map(obj => [obj.order_id, obj]))
+    const itemOrders = await prisma.cleanItemOrder.findMany();
+    const totalPaymentMap = await buildTotalPaymentMap();
+    const itemsTotalValuesMap = await buildTotalValuesMap();
 
     let goldFactSales: GoldFactSales[] = [];
 
