@@ -1,3 +1,4 @@
+import { FactSalesData } from "../domain/csvTypes";
 import { isCleanOrder, isCleanOrderPayment, isOrder } from "../domain/typeCheckers";
 import { CleanOrder, CleanOrderPayment, GoldDimCustomer, GoldDimDate, GoldDimOrder, GoldDimProduct, GoldFactSales } from "../prisma/client/client";
 import { prisma } from "../prisma/prismaClient";
@@ -137,7 +138,7 @@ const buildDimDateID = (date: Date) : number => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = date.getMonth() + 1;
     const year = date.getFullYear();
-    return parseInt(`${day}${month}${year}`);
+    return parseInt(`${year}${month}${day}`);
 };
 
 const buildTotalPaymentMap = async () : Promise<Map<string,number>> => {
@@ -173,28 +174,37 @@ const buildGoldFactSales = async () => {
     const totalPaymentMap = await buildTotalPaymentMap();
     const itemsTotalValuesMap = await buildTotalValuesMap();
 
-    let goldFactSales: GoldFactSales[] = [];
-
+    let goldFactSales: FactSalesData[] = [];
     for (const itemOrder of itemOrders) {
         const order = orderMap.get(itemOrder.order_id)
         if (!isCleanOrder(order)) {
             throw new Error(`order wasn't found: ${order}`)
         }
 
+        const totalPayment = totalPaymentMap.get(itemOrder.order_id) || 0;
+        const itemValues = itemsTotalValuesMap.get(itemOrder.order_id) || 0;
+        const payment_allocated = totalPayment * ((itemOrder.price + itemOrder.freight_value) / itemValues);
+
         goldFactSales.push({
-            id: 0,
             date_id: buildDimDateID(order.order_purchase_timestamp),
             order_id: itemOrder.order_id,
             customer_id: order.customer_id,
             product_id: itemOrder.product_id,
             freight_value: itemOrder.freight_value,
             item_price: itemOrder.price,
-            payment_value_allocated: 0,
+            payment_value_allocated: payment_allocated,
             is_delivered: order.order_status === "delivered",
             is_canceled: order.order_status === "canceled",
             is_on_time: order.order_status === "delivered" && 
                 order.order_delivered_customer_date <= order.order_estimated_delivery_date,
         });
+        
+        if (goldFactSales.length >= 1000) {
+            await prisma.goldFactSales.createMany({
+                data: goldFactSales,
+            });
+            goldFactSales = []
+        }
     };
     if (goldFactSales.length > 0) {
         await prisma.goldFactSales.createMany({
