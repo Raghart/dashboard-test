@@ -5,7 +5,7 @@ import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVI
 import { prisma } from "../prisma/prismaClient";
 import Papa from 'papaparse';
 import { parseRawDate, parseRawObject } from "../domain/parseTypes";
-import { RawCustomer } from "../prisma/client/client";
+import { RawCategName, RawCustomer, RawOrder, RawOrderPayment, RawOrderReview, RawProduct, RawSeller } from "../prisma/client/client";
 
 const fetchCSVPaparse = async (dataStruct: CsvData<any>) => {
     const res = await axios.get(dataStruct.url);
@@ -115,6 +115,7 @@ const buildCsvLayout = () => {
             }
 
             this.dataArray.push({
+                id: 0,
                 order_id: row.data?.order_id ?? null,
                 payment_sequential: row.data?.payment_sequential ?? null,
                 payment_type: row.data?.payment_type ?? null,
@@ -154,6 +155,7 @@ const buildCsvLayout = () => {
             }
 
             this.dataArray.push({
+                id: 0,
                 review_id: row.data?.review_id ?? null,
                 order_id: row.data?.order_id ?? null,
                 review_score: row.data?.review_score ?? null,
