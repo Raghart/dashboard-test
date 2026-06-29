@@ -1,5 +1,5 @@
 import axios from "axios";
-import { CsvData, RawItemData, RawOrderReviewData } from "../domain/csvTypes";
+import { CsvData, RawItemData, RawOrderPaymentData, RawOrderReviewData } from "../domain/csvTypes";
 import { CATNAMEURL, CUSTOMERURL, ITMORDERURL, ORDERSURL, ORDPAYMENTURL, ORDREVIEWSURL, PRODUCTSURL, 
     SELLERSURL } from "../domain/csvUrls";
 import { prisma } from "../prisma/prismaClient";
@@ -105,7 +105,7 @@ const buildCsvLayout = () => {
             }
     };
 
-    const orderPaymentStruct: CsvData<RawOrderPayment> = {
+    const orderPaymentStruct: CsvData<RawOrderPaymentData> = {
         url: ORDPAYMENTURL,
         label: "Order payments",
         dataArray: [],
@@ -115,7 +115,6 @@ const buildCsvLayout = () => {
             }
 
             this.dataArray.push({
-                id: 0,
                 order_id: row.data?.order_id ?? null,
                 payment_sequential: row.data?.payment_sequential ?? null,
                 payment_type: row.data?.payment_type ?? null,

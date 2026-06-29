@@ -26,6 +26,14 @@ export interface RawOrderReviewData {
     review_answer_timestamp: Date | null;
 }
 
+export interface RawOrderPaymentData {
+    order_id: string | null;
+    payment_sequential: number | null;
+    payment_type: string | null;
+    payment_installments: number | null;
+    payment_value: number | null;
+}
+
 export interface FactSalesData {
     order_id: string;
     product_id: string;
