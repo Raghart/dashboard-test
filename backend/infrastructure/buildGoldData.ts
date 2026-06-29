@@ -140,6 +140,18 @@ const buildDimDateID = (date: Date) : number => {
     return parseInt(`${day}${month}${year}`);
 };
 
+const buildTotalPaymentMap = async () : Promise<Map<string,number>> => {
+    const orderPayments = await prisma.cleanOrderPayment.findMany();
+    const totalPaymentMap = new Map<string, number>();
+
+    for (const orderPayment of orderPayments) {
+        const currentTotal = totalPaymentMap.get(orderPayment.order_id) || 0;
+        totalPaymentMap.set(orderPayment.order_id, currentTotal + orderPayment.payment_value);
+    }
+
+    return totalPaymentMap;
+};
+
 const buildGoldFactSales = async () => {
     const ordersData = await prisma.cleanOrder.findMany();
     const orderMap = new Map(ordersData.map(obj => [obj.order_id, obj]))
