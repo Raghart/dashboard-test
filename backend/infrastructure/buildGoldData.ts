@@ -133,12 +133,20 @@ const buildGoldDates = async () => {
     console.log("The Gold Dimension for Dates has been sucessfully processed!");
 }
 
+const buildDimDateID = (date: Date) : number => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return parseInt(`${day}${month}${year}`);
+};
+
 const buildGoldFactSales = async () => {
     const ordersData = await prisma.cleanOrder.findMany();
     const orderMap = new Map(ordersData.map(obj => [obj.order_id, obj]))
-    const itemOrders = await prisma.cleanItemOrder.findMany();
     const orderPayments = await prisma.cleanOrderPayment.findMany();
     const orderPaymentsMap = new Map(orderPayments.map(obj => [obj.order_id, obj]))
+    
+    const itemOrders = await prisma.cleanItemOrder.findMany();
     let goldFactSales: GoldFactSales[] = [];
 
     for (const itemOrder of itemOrders) {
@@ -154,7 +162,7 @@ const buildGoldFactSales = async () => {
 
         goldFactSales.push({
             id: 0,
-            date_id: 0,
+            date_id: buildDimDateID(order.order_purchase_timestamp),
             order_id: itemOrder.order_id,
             customer_id: order.customer_id,
             product_id: itemOrder.product_id,
