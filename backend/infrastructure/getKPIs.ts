@@ -24,4 +24,17 @@ const getKPI_IPO = async () => {
     return totalItems / totalOrders;
 };
 
-console.log(await getKPI_IPO());
+const getKPI_CancellationRate = async () => {
+    const totalCancellations = await prisma.goldDimOrder.count({
+        where: {
+            order_status: {
+                in: ["canceled", "unavailable"]
+            },
+        }
+    });
+    const totalOrders = await prisma.goldDimOrder.count();
+    if (totalCancellations === 0 || totalOrders === 0) return 0; 
+    return totalCancellations / totalOrders;
+};
+
+console.log(await getKPI_CancellationRate());
