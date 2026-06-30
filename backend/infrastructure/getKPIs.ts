@@ -106,6 +106,23 @@ const getDailyRevenueTrend = async () => {
     });
 
     return trends;
-}
+};
 
-console.log(await getDailyRevenueTrend());
+const getDeliveryPercentage = async () => {
+    const totalDeliveries = await prisma.goldFactSales.count({
+        where: {
+            is_delivered: true,
+        }
+    });
+    if (totalDeliveries === 0) return 0;
+
+    const onTimeDeliveries = await prisma.goldFactSales.count({
+        where: {
+            is_on_time: true,
+        }
+    });
+
+    return (totalDeliveries / onTimeDeliveries) * 100;
+};
+
+console.log(await getDeliveryPercentage());
