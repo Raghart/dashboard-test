@@ -122,7 +122,7 @@ const getDeliveryPercentage = async () => {
         }
     });
 
-    return (totalDeliveries / onTimeDeliveries) * 100;
+    return (onTimeDeliveries / totalDeliveries) * 100;
 };
 
 console.log(await getDeliveryPercentage());
