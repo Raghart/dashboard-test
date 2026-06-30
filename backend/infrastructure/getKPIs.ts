@@ -37,4 +37,14 @@ const getKPI_CancellationRate = async () => {
     return totalCancellations / totalOrders;
 };
 
-console.log(await getKPI_CancellationRate());
+const getKPI_GMV = async () : Promise<number> => {
+    const agg = await prisma.goldFactSales.aggregate({
+        _sum: {
+            item_price: true,
+        }
+    });
+
+    return agg._sum.item_price || 0;
+};
+
+console.log(await getKPI_GMV());
