@@ -91,4 +91,21 @@ const getTopProductsByRevenue = async () => {
     return products;
 };
 
-console.log(await getTopProductsByRevenue());
+const getDailyRevenueTrend = async () => {
+    const trends = await prisma.goldFactSales.groupBy({
+        by: ["date_id"],
+        _sum: {
+            payment_value_allocated: true,
+        },
+        _count: {
+            order_id: true,
+        },
+        orderBy: {
+            date_id: "asc"
+        }
+    });
+
+    return trends;
+}
+
+console.log(await getDailyRevenueTrend());
