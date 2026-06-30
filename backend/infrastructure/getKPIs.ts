@@ -74,4 +74,21 @@ const getTopProductsGMV = async () => {
     return products;
 };
 
-console.log(await getTopProductsGMV());
+const getTopProductsByRevenue = async () => {
+    const products = await prisma.goldFactSales.groupBy({
+        by: ["product_id"],
+        _sum: {
+            payment_value_allocated: true,
+        },
+        orderBy: {
+            _sum: {
+                payment_value_allocated: "desc"
+            }
+        },
+        take: 10,
+    });
+
+    return products;
+};
+
+console.log(await getTopProductsByRevenue());
