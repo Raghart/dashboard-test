@@ -57,4 +57,21 @@ const getKPI_Reveneue = async () => {
     return agg._sum.payment_value_allocated;
 };
 
-console.log(await getKPI_Reveneue());
+const getTopProductsGMV = async () => {
+    const products = await prisma.goldFactSales.groupBy({
+        by: ["product_id"],
+        _sum: {
+            item_price: true,
+        },
+        orderBy: {
+            _sum: {
+                item_price: "desc"
+            },
+        },
+        take: 10,
+    });
+
+    return products;
+};
+
+console.log(await getTopProductsGMV());
