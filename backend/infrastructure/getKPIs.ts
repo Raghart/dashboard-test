@@ -17,4 +17,11 @@ const getKPI_AOV = async () : Promise<number> => {
     return (result._sum.payment_value_allocated || 0) / totalOrders;
 };
 
-console.log(await getKPI_AOV());
+const getKPI_IPO = async () => {
+    const totalItems = await prisma.goldFactSales.count();
+    if (totalItems === 0) return 0;
+    const totalOrders = await prisma.goldDimOrder.count();
+    return totalItems / totalOrders;
+};
+
+console.log(await getKPI_IPO());
