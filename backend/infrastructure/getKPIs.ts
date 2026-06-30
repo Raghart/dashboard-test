@@ -47,4 +47,14 @@ const getKPI_GMV = async () : Promise<number> => {
     return agg._sum.item_price || 0;
 };
 
-console.log(await getKPI_GMV());
+const getKPI_Reveneue = async () => {
+    const agg = await prisma.goldFactSales.aggregate({
+        _sum: {
+            payment_value_allocated: true,
+        }
+    });
+
+    return agg._sum.payment_value_allocated;
+};
+
+console.log(await getKPI_Reveneue());
